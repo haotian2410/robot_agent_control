@@ -1,0 +1,16 @@
+name: release
+version: "2.0"
+
+strategies:
+  default_release:
+    enabled: true
+    schema: strategies/default_release/default_release.schema.yaml
+    defaults:
+      open_width: 0.08
+      open_speed: 0.5
+      position_tolerance: 0.002
+      settle_time: 0.0
+
+execution:
+  verify_after_release: true
+  stop_on_error: true

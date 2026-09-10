@@ -1,0 +1,26 @@
+<mujoco model="empty_scene">
+  <option gravity="0 0 -9.81"/>
+  <statistic center="0 0 0" extent="5"/>
+
+  <visual>
+    <headlight ambient="0.35 0.35 0.35" diffuse="0.8 0.8 0.8"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+  </visual>
+
+  <asset>
+    <texture name="sky" type="skybox" builtin="gradient"
+             rgb1="0.35 0.55 0.75" rgb2="0.05 0.08 0.12"
+             width="512" height="3072"/>
+    <texture name="grid" type="2d" builtin="checker"
+             rgb1="0.18 0.22 0.25" rgb2="0.55 0.60 0.62"
+             width="512" height="512"/>
+    <material name="grid_material" texture="grid" texrepeat="10 10"
+              texuniform="true" reflectance="0.1"/>
+  </asset>
+
+  <worldbody>
+    <light name="sun" pos="0 0 5" dir="0 0 -1" directional="true"/>
+    <geom name="ground" type="plane" size="5 5 0.1"
+          material="grid_material"/>
+  </worldbody>
+</mujoco>

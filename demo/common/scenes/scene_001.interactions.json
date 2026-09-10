@@ -1,0 +1,160 @@
+{
+  "version": 2,
+  "scene": "world_model/robotsim/scene_001.xml",
+  "move_defaults": {
+    "motion": {"path_constraint": "soft", "phase": "transit", "optimization_goal": "balanced"},
+    "planning": {"mode": "auto", "allow_replan": true, "planning_time": 8.0, "max_attempts": 3},
+    "constraints": {"avoid_collision": true, "velocity_scale": 0.8, "acceleration_scale": 0.8, "position_tolerance": 0.005, "orientation_tolerance": 2.0, "timeout": 30.0},
+    "strategy_params": {"ik_method": "trac_ik", "cartesian_step": 0.01}
+  },
+  "named_targets": {
+    "home": {
+      "aliases": ["Home", "home", "初始位", "原点"],
+      "request": {"target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]}}
+    }
+  },
+  "objects": {
+    "red_ball": {
+      "interactable": true,
+      "object_id": "red_ball",
+      "body_name": "red_ball_body",
+      "aliases": ["红色小球", "红球", "小球"],
+      "spatial": {"source": {"type": "body", "name": "red_ball_body"}, "reference_pose": {"position": [0.48, 0.42, 0.67], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "red_ball_target", "aliases": ["目标处", "物体处"]}, "grasp": {"target_id": "red_ball_grasp", "aliases": ["抓取位姿", "抓取位置", "红球处", "球处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.125, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "red_ball_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
+      "default_interactions": {"grasp": "grasp"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "red_ball", "expected_width": 0.05}, "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"}, "constraints": {"verify_grasp": true, "retry_count": 1, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": true}, "strategy_params": {"open_width": 0.08, "close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "position_tolerance": 0.01, "settle_time": 0.0}},
+        "release": {"target": {"type": "object", "object_id": "red_ball"}, "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": true}}
+      }
+    },
+    "green_box": {
+      "interactable": false,
+      "object_id": "green_box",
+      "aliases": ["绿色盒子", "绿盒子", "绿盒"],
+      "spatial": {"source": {"type": "body", "name": "green_box"}, "reference_pose": {"position": [0.48, 0.42, 0.6], "quaternion_wxyz": [0.965925826, 0, 0, 0.258819045]}, "default_anchor": "interaction", "anchors": {"interaction": {"target_id": "green_box_interaction", "aliases": ["交互位", "盒子处"], "local_position": [0.0, 0.0, 0.25]}, "interior": {"target_id": "green_box_interior", "aliases": ["内部", "里面", "盒内"], "local_position": [0.0, 0.0, 0.07], "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.15, "below": 0.1, "front": 0.25, "behind": 0.25, "left": 0.25, "right": 0.25, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 30.0}, "relation_tool_orientations": {"above": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "work_table": {
+      "interactable": false,
+      "object_id": "work_table",
+      "aliases": ["工作台", "桌面", "桌子"],
+      "spatial": {"source": {"type": "body", "name": "work_table"}, "reference_pose": {"position": [0.525, 0.0, 0.0], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]}, "default_anchor": "surface", "anchors": {"surface": {"target_id": "work_table_surface", "aliases": ["台面", "桌面处"], "local_position": [0.0, 0.0, 0.60]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.15, "below": 0.1, "front": 0.45, "behind": 0.45, "left": 0.85, "right": 0.85, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "blue_cabinet": {
+      "interactable": false,
+      "object_id": "blue_cabinet",
+      "aliases": ["蓝色柜子", "蓝柜"],
+      "spatial": {"source": {"type": "body", "name": "blue_cabinet"}, "reference_pose": {"position": [0.58, -0.42, 0.6], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "center", "anchors": {"center": {"target_id": "blue_cabinet_center", "aliases": ["柜体中心", "柜子处"], "local_position": [0.0, 0.0, 0.21]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.30, "below": 0.1, "front": 0.32, "behind": 0.32, "left": 0.25, "right": 0.25, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "small_drawer_cabinet": {
+      "interactable": false,
+      "object_id": "small_drawer_cabinet",
+      "aliases": ["抽屉柜", "小抽屉柜"],
+      "spatial": {"source": {"type": "body", "name": "small_drawer_cabinet"}, "reference_pose": {"position": [0.76, 0.10, 0.6], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]}, "default_anchor": "center", "anchors": {"center": {"target_id": "small_drawer_cabinet_center", "aliases": ["柜体中心", "柜子处"], "local_position": [0.0, 0.0, 0.17]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.25, "below": 0.1, "front": 0.30, "behind": 0.30, "left": 0.22, "right": 0.22, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "blue_cabinet_upper_compartment": {
+      "interactable": false,
+      "object_id": "blue_cabinet_upper_compartment",
+      "aliases": ["蓝色柜子上层", "原柜子上层", "柜子上层"],
+      "spatial": {"source": {"type": "body", "name": "blue_cabinet"}, "reference_pose": {"position": [0.58, -0.42, 0.6], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "interior", "anchors": {"interior": {"target_id": "blue_cabinet_upper_interior", "aliases": ["内部", "里面"], "local_position": [-0.07, 0.0, 0.26]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.23, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "blue_cabinet_lower_compartment": {
+      "interactable": false,
+      "object_id": "blue_cabinet_lower_compartment",
+      "aliases": ["蓝色柜子下层", "原柜子下层", "柜子下层"],
+      "spatial": {"source": {"type": "body", "name": "blue_cabinet"}, "reference_pose": {"position": [0.58, -0.42, 0.6], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "interior", "anchors": {"interior": {"target_id": "blue_cabinet_lower_interior", "aliases": ["内部", "里面"], "local_position": [-0.07, 0.0, 0.10]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.23, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+      "default_interactions": {},
+      "action_requests": {}
+    },
+    "blue_cabinet_handle": {
+      "interactable": true,
+      "object_id": "blue_cabinet_handle",
+      "body_name": "blue_cabinet_door",
+      "aliases": ["蓝色柜门把手", "柜门把手", "柜门手柄"],
+      "spatial": {"source": {"type": "site", "name": "blue_cabinet_handle_site"}, "reference_pose": {"position": [0.4304673206, -0.2246414123, 0.81], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "target", "anchors": {"target": {"target_id": "blue_cabinet_handle_target", "aliases": ["把手处", "接触位", "抓取位姿"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}, "moved_tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 75.0}, "preferred_joint_ik_seed": [-1.2984174059, -1.9615684094, 2.3431091128, -0.3815408360, 0.5341784346, 3.1415927663]},
+      "default_interactions": {"grasp": "target"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "blue_cabinet_handle"}, "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"}, "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false}, "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}},
+        "release": {"target": {"type": "object", "object_id": "blue_cabinet_handle"}, "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}}
+      }
+    },
+    "blue_cabinet_door": {
+      "interactable": true,
+      "object_id": "blue_cabinet_door",
+      "aliases": ["蓝色柜门", "柜门"],
+      "affordances": {"pull": {"acting_target": "blue_cabinet_door", "contact_target": "blue_cabinet_handle"}, "push": {"acting_target": "blue_cabinet_door", "contact_target": "blue_cabinet_handle"}},
+      "spatial": {"source": {"type": "site", "name": "blue_cabinet_handle_site"}, "reference_pose": {"position": [0.4304673206, -0.2246414123, 0.81], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "target", "anchors": {"target": {"target_id": "blue_cabinet_door_handle", "aliases": ["把手", "手柄", "目标处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+      "default_interactions": {"pull": "handle", "push": "handle"},
+      "action_requests": {
+        "pull": {"target": {"type": "mechanism", "object_id": "blue_cabinet_door", "contact_normal": [-0.9659258263, 0.2588190451, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "pull", "trajectory": "circular", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_angle": 1.57079632679, "angular_speed": 0.8, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"arc_center": [0.3788644397, -0.5524556016, 0.81], "arc_axis": [0.0, 0.0, 1.0], "arc_angle": 1.57079632679, "frame": "world"}},
+        "push": {"target": {"type": "mechanism", "object_id": "blue_cabinet_door", "contact_normal": [-0.2588190451, -0.9659258263, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "push", "trajectory": "circular", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_angle": 1.57079632679, "angular_speed": 0.8, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"arc_center": [0.3788644397, -0.5524556016, 0.81], "arc_axis": [0.0, 0.0, 1.0], "arc_angle": -1.57079632679, "frame": "world"}}
+      }
+    },
+    "small_cabinet_upper_drawer_handle": {
+      "interactable": true,
+      "object_id": "small_cabinet_upper_drawer_handle",
+      "aliases": ["上层抽屉把手", "上抽屉把手"],
+      "spatial": {"source": {"type": "site", "name": "small_cabinet_upper_drawer_handle_site"}, "reference_pose": {"position": [0.605, 0.10, 0.855], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "upper_drawer_handle_target", "aliases": ["把手处", "抓取位姿", "接触位"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {"grasp": "target"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"}, "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"}, "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false}, "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}},
+        "release": {"target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"}, "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}}
+      }
+    },
+    "small_cabinet_upper_drawer": {
+      "interactable": true,
+      "object_id": "small_cabinet_upper_drawer",
+      "aliases": ["上层抽屉", "上抽屉"],
+      "affordances": {"pull": {"acting_target": "small_cabinet_upper_drawer", "contact_target": "small_cabinet_upper_drawer_handle"}, "push": {"acting_target": "small_cabinet_upper_drawer", "contact_target": "small_cabinet_upper_drawer_handle"}},
+      "spatial": {"source": {"type": "site", "name": "small_cabinet_upper_drawer_handle_site"}, "reference_pose": {"position": [0.605, 0.10, 0.855], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "upper_drawer_target", "aliases": ["把手处", "目标处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {"pull": "handle", "push": "handle"},
+      "action_requests": {
+        "pull": {"target": {"type": "mechanism", "object_id": "small_cabinet_upper_drawer", "contact_normal": [-1.0, 0.0, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "pull", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"direction": [-1.0, 0.0, 0.0], "distance": 0.18, "frame": "world", "carried_objects": ["drawer_cube_body"]}},
+        "push": {"target": {"type": "mechanism", "object_id": "small_cabinet_upper_drawer", "contact_normal": [1.0, 0.0, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "push", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"direction": [1.0, 0.0, 0.0], "distance": 0.18, "frame": "world", "carried_objects": ["drawer_cube_body"]}}
+      }
+    },
+    "small_cabinet_lower_drawer_handle": {
+      "interactable": true,
+      "object_id": "small_cabinet_lower_drawer_handle",
+      "aliases": ["下层抽屉把手", "下抽屉把手"],
+      "spatial": {"source": {"type": "site", "name": "small_cabinet_lower_drawer_handle_site"}, "reference_pose": {"position": [0.605, 0.10, 0.685], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "lower_drawer_handle_target", "aliases": ["把手处", "抓取位姿", "接触位"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {"grasp": "target"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "small_cabinet_lower_drawer_handle"}, "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"}, "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false}, "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}},
+        "release": {"target": {"type": "object", "object_id": "small_cabinet_lower_drawer_handle"}, "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}}
+      }
+    },
+    "small_cabinet_lower_drawer": {
+      "interactable": true,
+      "object_id": "small_cabinet_lower_drawer",
+      "aliases": ["下层抽屉", "下抽屉"],
+      "affordances": {"pull": {"acting_target": "small_cabinet_lower_drawer", "contact_target": "small_cabinet_lower_drawer_handle"}, "push": {"acting_target": "small_cabinet_lower_drawer", "contact_target": "small_cabinet_lower_drawer_handle"}},
+      "spatial": {"source": {"type": "site", "name": "small_cabinet_lower_drawer_handle_site"}, "reference_pose": {"position": [0.605, 0.10, 0.685], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "lower_drawer_target", "aliases": ["把手处", "目标处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {"pull": "handle", "push": "handle"},
+      "action_requests": {
+        "pull": {"target": {"type": "mechanism", "object_id": "small_cabinet_lower_drawer", "contact_normal": [-1.0, 0.0, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "pull", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"direction": [-1.0, 0.0, 0.0], "distance": 0.18, "frame": "world"}},
+        "push": {"target": {"type": "mechanism", "object_id": "small_cabinet_lower_drawer", "contact_normal": [1.0, 0.0, 0.0], "normal_frame": "world"}, "manipulation": {"operation": "push", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"}, "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true}, "strategy_params": {"direction": [1.0, 0.0, 0.0], "distance": 0.18, "frame": "world"}}
+      }
+    },
+    "drawer_cube": {
+      "interactable": true,
+      "object_id": "drawer_cube",
+      "body_name": "drawer_cube_body",
+      "aliases": ["抽屉内方块", "橙色方块", "方块"],
+      "spatial": {"source": {"type": "body", "name": "drawer_cube_body"}, "reference_pose": {"position": [0.75, 0.10, 0.834], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "drawer_cube_target", "aliases": ["目标处", "物体处"]}, "grasp": {"target_id": "drawer_cube_grasp", "aliases": ["抓取位姿", "方块处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.116, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "drawer_cube_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+      "default_interactions": {"grasp": "grasp"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "drawer_cube", "expected_width": 0.05}, "grasp": {"operation": "grasp"}, "constraints": {"verify_grasp": true, "retry_count": 1, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": true}, "strategy_params": {"open_width": 0.08, "close_width": 0.02, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}},
+        "release": {"target": {"type": "object", "object_id": "drawer_cube"}, "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": true}}
+      }
+    }
+  }
+}

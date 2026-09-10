@@ -1,0 +1,38 @@
+name: JointMove
+version: "2.0"
+
+description: Parameters specific to the Joint Move Path Strategy.
+
+input:
+  joint_target:
+    type: array
+    item_type: float
+    unit: radian
+    description: Optional override; normally derived from the Move target.
+
+  named_state:
+    type: string
+    description: Optional configured robot state.
+
+  ik_solution_policy:
+    type: string
+    default: nearest
+    enum: [nearest, minimum_motion, avoid_limits, custom]
+
+  interpolation:
+    type: string
+    default: quintic
+    enum: [linear, cubic, quintic]
+
+  preserve_current_configuration:
+    type: boolean
+    default: true
+
+  ik_seed:
+    type: array
+    item_type: float
+    unit: radian
+    description: Optional IK seed supplied by the runtime or task planner.
+
+validation_rules:
+  - require_any: [joint_target, named_state, move.target]

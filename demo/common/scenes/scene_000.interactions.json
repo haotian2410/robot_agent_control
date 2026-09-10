@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "scene": "world_model/robotsim/scene_000.xml",
+  "named_targets": {"home": {"aliases": ["Home", "home", "初始位", "原点"], "request": {"target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]}}}},
+  "objects": {}
+}

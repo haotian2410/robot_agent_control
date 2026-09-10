@@ -1,0 +1,84 @@
+name: Release
+version: "2.0"
+
+description: Open a compatible gripper at its current pose, detach a held payload, and verify release state.
+
+input:
+  target:
+    type: object
+    required: true
+    properties:
+      type: {type: string, required: true, enum: [object]}
+      object_id: {type: string, required: true}
+
+  release:
+    type: object
+    default: {}
+    properties:
+      strategy: {type: string, default: auto, enum: [auto, default_release]}
+      operation: {type: string, default: release, enum: [release, open, verify_only]}
+      verification_mode: {type: string, default: auto, enum: [auto, state, disabled]}
+
+  constraints:
+    type: object
+    default: {}
+    properties:
+      verify_release: {type: boolean, default: true}
+      retry_count: {type: integer, range: [0, 10], default: 0}
+      timeout: {type: float, unit: second, range: [0.1, 600.0], default: 5.0}
+      open_width:
+        type: float
+        unit: meter
+        range: [0.0, 0.085]
+        description: Backward-compatible alias for strategy_params.open_width.
+
+  strategy_params:
+    type: object
+    default: {}
+    description: Parameters owned by the selected Release Strategy.
+
+  runtime_context:
+    type: object
+    internal: true
+    properties:
+      current_gripper_state: {type: object}
+      current_end_effector_pose: {type: object}
+      gripper_model: {type: object}
+      gripper_limits: {type: object}
+      gripper_controller_state: {type: object}
+      object_presence_state: {type: object}
+      payload_state: {type: object}
+      safety_state: {type: object}
+
+output:
+  success: {type: boolean}
+  status: {type: string, enum: [completed, failed, timeout]}
+  selection:
+    type: object
+    nullable: true
+    properties:
+      release_strategy: {type: string, enum: [default_release]}
+      selection_reason: {type: string}
+      retry_used: {type: boolean}
+  release_result:
+    type: object
+    nullable: true
+    properties:
+      released: {type: boolean}
+      final_width: {type: float, unit: meter}
+      holding: {type: boolean}
+      object_present: {type: boolean}
+      verified: {type: boolean}
+      verification_method: {type: string}
+      attempts: {type: integer}
+      evidence: {type: object}
+      execution_time: {type: float, unit: second}
+  error:
+    type: object
+    nullable: true
+    properties:
+      error_code: {type: string}
+      error_message: {type: string}
+      failed_stage: {type: string}
+      recoverable: {type: boolean}
+      recommended_action: {type: string}

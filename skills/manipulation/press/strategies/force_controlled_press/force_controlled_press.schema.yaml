@@ -1,0 +1,50 @@
+name: ForceControlledPress
+version: "1.0"
+
+description: Parameters specific to the Force-Controlled Press Strategy.
+
+input:
+  target_force:
+    type: float
+    unit: newton
+    range: [0.0001, 10000.0]
+    required: true
+
+  contact_force:
+    type: float
+    unit: newton
+    range: [0.0, 10000.0]
+    default: 2.0
+
+  force_ramp_rate:
+    type: float
+    unit: newton_per_second
+    range: [0.0001, 100000.0]
+    default: 20.0
+
+  force_control_gain:
+    type: object
+    description: Controller-specific gain set or named configuration reference.
+
+  force_settle_time:
+    type: float
+    unit: second
+    range: [0.0, 60.0]
+    default: 0.2
+
+  allow_force_overshoot:
+    type: boolean
+    default: false
+
+  overshoot_limit:
+    type: float
+    unit: newton
+    range: [0.0, 10000.0]
+    default: 1.0
+
+validation_rules:
+  - assert: target_force <= press.constraints.maximum_force
+  - assert: contact_force <= target_force
+  - when: allow_force_overshoot == true
+    assert: target_force + overshoot_limit <= press.constraints.maximum_force
+  - require_runtime_any: [force_torque_state, tactile_state]

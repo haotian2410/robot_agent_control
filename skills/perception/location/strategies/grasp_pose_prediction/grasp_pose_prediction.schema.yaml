@@ -1,0 +1,100 @@
+name: GraspPosePrediction
+version: "1.0"
+
+description: >-
+  Parameters for predicting target-conditioned 6-DoF parallel-gripper grasp poses
+  from RGB-D or point-cloud observations.
+
+input:
+  grasp_model:
+    type: string
+    default: auto
+    enum: [auto, contact_graspnet, graspnet, anygrasp, custom]
+
+  input_mode:
+    type: string
+    default: auto
+    enum: [auto, rgbd, point_cloud]
+
+  target_conditioning:
+    type: string
+    default: auto
+    enum: [auto, mask, bbox, description, category, scene]
+
+  target_description:
+    type: string
+    description: Optional target description override.
+
+  allow_scene_level:
+    type: boolean
+    default: false
+    description: Permit grasp prediction on the entire scene without a unique target instance.
+
+  num_candidates:
+    type: integer
+    range: [1, 1000]
+    default: 50
+
+  score_threshold:
+    type: float
+    range: [0.0, 1.0]
+    default: 0.5
+
+  min_gripper_width:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.0
+
+  max_gripper_width:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    description: Defaults to the active gripper maximum opening when omitted.
+
+  roi_margin:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.02
+
+  nms_translation_threshold:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.02
+
+  nms_rotation_threshold:
+    type: float
+    unit: degree
+    range: [0.0, 180.0]
+    default: 15.0
+
+  require_collision_free:
+    type: boolean
+    default: true
+
+  require_reachable:
+    type: boolean
+    default: true
+
+  approach_clearance:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.05
+
+validation_rules:
+  - require: [locate.target.type]
+  - when: locate.target.type != grasp
+    invalid: true
+  - require_any:
+      - locate.target.object
+      - locate.target.instruction
+      - locate.target.category
+      - locate.target.instance_id
+      - locate.target.model_id
+      - allow_scene_level
+  - require_runtime_any:
+      - locate.runtime_context.depth_image
+      - locate.runtime_context.scene_point_cloud

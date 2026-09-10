@@ -1,0 +1,137 @@
+name: search
+version: "1.0"
+
+description: Default configuration for the active View Search Skill skeleton.
+
+search:
+  default_goal: locate
+  default_mode: single_step
+  default_output_frame: base
+  default_candidate_selection: highest_score
+  default_max_candidates: 20
+  default_max_steps: 8
+  default_confidence_threshold: 0.7
+  default_quality_threshold: 0.6
+  default_timeout: 30.0
+
+selector:
+  explicit_request_has_priority: true
+  sufficient_observation_stops_search: true
+  visibility_priority:
+    partial_with_occlusion: occlusion_aware_view
+    visible_low_quality: local_view_refinement
+    not_visible_with_prior: prior_guided_search
+    not_visible_without_prior: systematic_scan
+  safety_can_override_selection: true
+
+fallback:
+  enabled: true
+  auto_only: true
+  preserve_explicit_strategy: true
+  chains:
+    occlusion_aware_view:
+      - prior_guided_search
+      - systematic_scan
+    local_view_refinement:
+      - prior_guided_search
+      - systematic_scan
+    prior_guided_search:
+      - systematic_scan
+    systematic_scan: []
+
+strategies:
+  systematic_scan:
+    enabled: true
+    schema: strategies/systematic_scan/systematic_scan.schema.yaml
+    defaults:
+      scan_pattern: z_scan
+      scan_axis: horizontal
+      scan_step: 0.08
+      row_step: 0.08
+      candidate_count: 20
+      look_at_mode: region_center
+      skip_visited: true
+
+  prior_guided_search:
+    enabled: true
+    schema: strategies/prior_guided_search/prior_guided_search.schema.yaml
+    defaults:
+      prior_radius: 0.25
+      candidate_distribution: hemisphere
+      candidate_count: 20
+      direction_bias_weight: 0.35
+      look_at_mode: target_prior
+      uncertainty_scale: 1.0
+
+  occlusion_aware_view:
+    enabled: true
+    schema: strategies/occlusion_aware_view/occlusion_aware_view.schema.yaml
+    defaults:
+      orbit_radius: 0.35
+      azimuth_offsets: [-45, -30, -15, 15, 30, 45]
+      elevation_offsets: [0, 15, 30]
+      candidate_count: 18
+      keep_target_in_view: true
+      minimum_expected_occlusion_reduction: 0.1
+
+  local_view_refinement:
+    enabled: true
+    schema: strategies/local_view_refinement/local_view_refinement.schema.yaml
+    defaults:
+      translation_step: 0.04
+      rotation_step: 10.0
+      candidate_count: 12
+      optimize_for:
+        - target_centering
+        - depth_coverage
+        - pose_quality
+      keep_target_in_view: true
+
+validation:
+  transform_to_output_frame: true
+  require_finite_values: true
+  normalize_quaternion: true
+  require_valid_look_at: true
+  field_of_view:
+    enabled: true
+    require_target_region_visible: true
+  history:
+    enabled: true
+    duplicate_position_tolerance: 0.03
+    duplicate_orientation_tolerance: 8.0
+    reject_failed_viewpoints: true
+  reachability:
+    enabled: true
+    use_robot_model: true
+  collision:
+    enabled: true
+    minimum_clearance: 0.03
+  view_distance:
+    minimum: 0.15
+    maximum: 1.50
+  candidate_ranking:
+    enabled: true
+    weights:
+      expected_visibility_gain: 0.25
+      expected_information_gain: 0.20
+      target_centering: 0.10
+      observation_quality: 0.10
+      reachability: 0.10
+      clearance: 0.10
+      motion_cost: 0.10
+      repeated_view_penalty: 0.05
+
+termination:
+  stop_when_observation_sufficient: true
+  confidence_threshold: 0.7
+  quality_threshold: 0.6
+  maximum_no_improvement_steps: 3
+  stop_when_candidates_exhausted: true
+
+runtime:
+  require_timestamp_consistency: true
+  max_observation_age: implementation_defined
+  require_camera_intrinsics: true
+  require_current_camera_pose: true
+  require_transform_tree: true
+  require_camera_extrinsics_for_wrist_mount: true

@@ -1,0 +1,8 @@
+name: DefaultRelease
+version: "1.0"
+
+strategy_params:
+  open_width: {type: float, unit: meter, range: [0.0, 0.085], default: 0.08}
+  open_speed: {type: float, range: [0.01, 1.0], default: 0.5}
+  position_tolerance: {type: float, unit: meter, range: [0.0, 0.085], default: 0.002}
+  settle_time: {type: float, unit: second, range: [0.0, 60.0], default: 0.0}

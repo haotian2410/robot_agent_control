@@ -1,0 +1,139 @@
+name: locate
+version: "2.0"
+
+description: Default configuration for the Locate Skill skeleton.
+
+locate:
+  default_output_frame: base
+  default_precision: medium
+  default_candidate_selection: highest_confidence
+  default_confidence_threshold: 0.5
+  default_timeout: 30.0
+
+selector:
+  explicit_request_has_priority: true
+  target_type_defaults:
+    grasp: grasp_pose_prediction
+    relative: relative_point_locate
+    approach: approach_point_locate
+  evidence_priority:
+    - model_id
+    - category
+    - open_vocabulary_description
+  safety_can_override_selection: true
+
+fallback:
+  enabled: true
+  auto_only: true
+  preserve_explicit_strategy: true
+  chains:
+    known_model_locate:
+      - known_category_locate
+      - unknown_object_locate
+    known_category_locate:
+      - unknown_object_locate
+    unknown_object_locate: []
+    grasp_pose_prediction: []
+    approach_point_locate: []
+    relative_point_locate: []
+
+strategies:
+  grasp_pose_prediction:
+    enabled: true
+    schema: strategies/grasp_pose_prediction/grasp_pose_prediction.schema.yaml
+    defaults:
+      grasp_model: auto
+      input_mode: auto
+      target_conditioning: auto
+      allow_scene_level: false
+      num_candidates: 50
+      score_threshold: 0.5
+      min_gripper_width: 0.0
+      roi_margin: 0.02
+      nms_translation_threshold: 0.02
+      nms_rotation_threshold: 15.0
+      require_collision_free: true
+      require_reachable: true
+      approach_clearance: 0.05
+
+  known_model_locate:
+    enabled: true
+    schema: strategies/known_model_locate/known_model_locate.schema.yaml
+    defaults:
+      registration_method: auto
+      voxel_size: 0.005
+      max_correspondence_distance: 0.02
+      fitness_threshold: 0.7
+      use_initial_guess: false
+
+  known_category_locate:
+    enabled: true
+    schema: strategies/known_category_locate/known_category_locate.schema.yaml
+    defaults:
+      detector_model: auto
+      detection_threshold: 0.5
+      segmentation_method: auto
+      instance_selection: highest_confidence
+      minimum_point_count: 50
+      pose_estimation_method: auto
+
+  unknown_object_locate:
+    enabled: true
+    schema: strategies/unknown_object_locate/unknown_object_locate.schema.yaml
+    defaults:
+      vlm_model: auto
+      point_selection_mode: point
+      depth_sampling_radius: 5
+      depth_aggregation: median
+      minimum_valid_depth_points: 3
+      orientation_estimation: true
+
+  approach_point_locate:
+    enabled: true
+    schema: strategies/approach_point_locate/approach_point_locate.schema.yaml
+    defaults:
+      approach_distance: 0.10
+      direction_frame: target
+      orientation_mode: keep_target
+      search_radius: 0.05
+      candidate_count: 10
+
+  relative_point_locate:
+    enabled: true
+    schema: strategies/relative_point_locate/relative_point_locate.schema.yaml
+    defaults:
+      default_offset: 0.05
+      orientation_mode: keep_reference
+      search_radius: 0.05
+      semantic_direction_mapping:
+        left: "+y"
+        right: "-y"
+        up: "+z"
+        down: "-z"
+        forward: "+x"
+        backward: "-x"
+
+validation:
+  transform_to_output_frame: true
+  require_finite_values: true
+  normalize_quaternion: true
+  check_confidence: true
+  reachability:
+    enabled: true
+    use_robot_model: true
+  collision:
+    enabled: true
+    minimum_clearance: 0.02
+  candidate_ranking:
+    enabled: true
+    weights:
+      confidence: 0.4
+      reachability: 0.25
+      clearance: 0.25
+      distance: 0.10
+
+runtime:
+  require_timestamp_consistency: true
+  max_observation_age: implementation_defined
+  require_camera_intrinsics_for_projection: true
+  require_transform_tree: true

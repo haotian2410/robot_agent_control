@@ -1,0 +1,28 @@
+name: PriorGuidedSearch
+version: "1.0"
+
+description: Parameters specific to the Prior-Guided Search Strategy.
+
+input:
+  prior_radius: {type: float, unit: meter, range: [0.001, 100.0], default: 0.25}
+  candidate_distribution:
+    type: string
+    default: hemisphere
+    enum: [hemisphere, ring, grid, directional]
+  candidate_count: {type: integer, range: [1, 10000], default: 20}
+  direction_bias_weight: {type: float, range: [0.0, 1.0], default: 0.35}
+  look_at_mode:
+    type: string
+    default: target_prior
+    enum: [target_prior, region_center, predicted_target, fixed_direction]
+  uncertainty_scale: {type: float, range: [0.0, 100.0], default: 1.0}
+  minimum_prior_confidence: {type: float, range: [0.0, 1.0], default: 0.2}
+
+validation_rules:
+  - require_any:
+      - search.target.prior_pose
+      - search.target.prior_region
+      - search.observation.direction_hint
+      - search.observation.image_edge_hint
+      - search.runtime_context.target_prior
+      - search.runtime_context.tracking_prediction

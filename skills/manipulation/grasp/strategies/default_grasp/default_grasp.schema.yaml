@@ -1,0 +1,70 @@
+name: DefaultGrasp
+version: "2.0"
+
+description: Parameters specific to the Default Grasp Strategy.
+
+input:
+  open_width:
+    type: float
+    unit: meter
+    range: [0.0, 10.0]
+    default: 0.08
+    description: Gripper opening width before closing on the target.
+
+  close_width:
+    type: float
+    unit: meter
+    range: [0.0, 10.0]
+    default: 0.0
+    description: Target gripper width after closing.
+
+  close_speed:
+    type: float
+    range: [0.0, 1.0]
+    default: 0.5
+    description: Normalized gripper closing speed.
+
+  grasp_force:
+    type: float
+    unit: newton
+    range: [0.0, 10000.0]
+    default: 20.0
+    description: Clamping force applied during grasp acquisition.
+
+  hold_force:
+    type: float
+    unit: newton
+    range: [0.0, 10000.0]
+    default: 10.0
+    description: Force maintained after a successful grasp.
+
+  contact_threshold:
+    type: float
+    range: [0.0, 10000.0]
+    default: 2.0
+    description: Force, current or position-derived threshold for target contact.
+
+  position_tolerance:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.002
+
+  force_tolerance:
+    type: float
+    unit: newton
+    range: [0.0, 10000.0]
+    default: 2.0
+
+  settle_time:
+    type: float
+    unit: second
+    range: [0.0, 60.0]
+    default: 0.3
+
+validation_rules:
+  - assert: close_width <= open_width
+  - assert: grasp_force <= grasp.constraints.maximum_force
+  - assert: hold_force <= grasp.constraints.maximum_force
+  - when: grasp.constraints.contact_required == true
+    require_runtime_any: [force_torque_state, tactile_state, finger_state]

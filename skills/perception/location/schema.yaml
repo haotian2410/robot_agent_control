@@ -1,0 +1,294 @@
+name: Locate
+version: "2.0"
+
+description: >-
+  Locate an operation target pose from object priors, visual observations,
+  point clouds, reference poses, offsets, or task instructions.
+
+input:
+  target:
+    type: object
+    required: true
+    description: Operation target to locate.
+    properties:
+      type:
+        type: string
+        required: true
+        enum: [grasp, place, press, insert, extract, approach, relative, object_pose]
+
+      object:
+        type: string
+        description: Object name, open-vocabulary description, or human-readable identifier.
+
+      instruction:
+        type: string
+        description: Natural-language description of the requested target point.
+
+      instance_id:
+        type: string
+        description: Optional target instance identifier.
+
+      category:
+        type: string
+        description: Known object category used by category-based localization.
+
+      model_id:
+        type: string
+        description: Known object model identifier used by model registration.
+
+      operation_point:
+        type: string
+        default: auto
+        description: Named or semantic operation point to generate from the object pose.
+
+  reference:
+    type: object
+    default: {}
+    description: Reference used by approach-point or relative-point localization.
+    properties:
+      type:
+        type: string
+        enum: [end_effector, object, pose, frame, target_pose]
+
+      id:
+        type: string
+        description: End-effector, object, target, or named frame identifier.
+
+      frame:
+        type: string
+        default: base
+
+      pose:
+        type: object
+        properties:
+          frame: {type: string, default: base}
+          position:
+            type: object
+            properties:
+              x: {type: float, unit: meter}
+              y: {type: float, unit: meter}
+              z: {type: float, unit: meter}
+          orientation:
+            type: object
+            description: Quaternion is recommended internally; RPY is accepted at the skill boundary.
+            properties:
+              representation:
+                type: string
+                default: quaternion
+                enum: [quaternion, rpy]
+              x: {type: float}
+              y: {type: float}
+              z: {type: float}
+              w: {type: float}
+              roll: {type: float, unit: degree}
+              pitch: {type: float, unit: degree}
+              yaw: {type: float, unit: degree}
+
+  offset:
+    type: object
+    default: {}
+    description: Semantic or Cartesian offset used by relative-point localization.
+    properties:
+      mode:
+        type: string
+        enum: [semantic, cartesian]
+
+      semantic:
+        type: object
+        properties:
+          direction:
+            type: string
+            enum: [left, right, up, down, forward, backward]
+          distance:
+            type: float
+            unit: meter
+            range: [0.0, 10.0]
+
+      cartesian:
+        type: object
+        properties:
+          frame: {type: string, default: reference}
+          x: {type: float, unit: meter, default: 0.0}
+          y: {type: float, unit: meter, default: 0.0}
+          z: {type: float, unit: meter, default: 0.0}
+
+  localization:
+    type: object
+    default: {}
+    description: Task-level localization intent used by the deterministic selector.
+    properties:
+      strategy:
+        type: string
+        default: auto
+        enum:
+          - auto
+          - known_model_locate
+          - known_category_locate
+          - grasp_pose_prediction
+          - unknown_object_locate
+          - approach_point_locate
+          - relative_point_locate
+
+      precision:
+        type: string
+        default: medium
+        enum: [low, medium, high]
+
+      output_frame:
+        type: string
+        default: base
+
+      candidate_selection:
+        type: string
+        default: highest_confidence
+        enum: [highest_confidence, nearest, instruction, safest]
+
+      max_candidates:
+        type: integer
+        range: [1, 1000]
+        default: 10
+
+      allow_fallback:
+        type: boolean
+        default: true
+
+  constraints:
+    type: object
+    default: {}
+    properties:
+      confidence_threshold:
+        type: float
+        range: [0.0, 1.0]
+        default: 0.5
+
+      check_reachability:
+        type: boolean
+        default: true
+
+      avoid_collision:
+        type: boolean
+        default: true
+
+      minimum_clearance:
+        type: float
+        unit: meter
+        range: [0.0, 1.0]
+        default: 0.02
+
+      position_tolerance:
+        type: float
+        unit: meter
+        range: [0.0, 1.0]
+        default: 0.01
+
+      orientation_required:
+        type: boolean
+        default: false
+
+      timeout:
+        type: float
+        unit: second
+        range: [0.1, 600.0]
+        default: 30.0
+
+  strategy_params:
+    type: object
+    default: {}
+    description: >-
+      Parameters owned by the selected Locate Strategy. The selected strategy
+      schema performs final strategy-specific validation.
+
+  runtime_context:
+    type: object
+    internal: true
+    description: Populated by the robot runtime rather than generated by the Agent.
+    properties:
+      rgb_image: {type: object}
+      depth_image: {type: object}
+      camera_info: {type: object}
+      scene_point_cloud: {type: object}
+      transform_tree: {type: object}
+      current_end_effector_pose: {type: object}
+      robot_state: {type: object}
+      robot_model: {type: object}
+      planning_scene: {type: object}
+      object_model_repository: {type: object}
+      perception_model_registry: {type: object}
+      target_prior: {type: object}
+
+  validation_rules:
+    - when: target.type == relative
+      require: [reference.type, offset.mode]
+    - when: target.type == approach
+      require_any: [reference.pose, strategy_params.target_pose]
+    - when: localization.strategy == known_model_locate
+      require_any: [target.model_id, runtime_context.target_prior.model_id]
+    - when: localization.strategy == known_category_locate
+      require_any: [target.category, runtime_context.target_prior.category]
+    - when: localization.strategy == unknown_object_locate
+      require_any: [target.object, target.instruction, strategy_params.target_description]
+    - when: localization.strategy == grasp_pose_prediction
+      require: [target.type]
+    - when: localization.strategy == grasp_pose_prediction
+      require_any: [target.object, target.instruction, target.category, target.instance_id, target.model_id, strategy_params.allow_scene_level]
+
+output:
+  success:
+    type: boolean
+
+  status:
+    type: string
+    enum: [completed, failed, timeout]
+
+  selection:
+    type: object
+    properties:
+      locate_strategy:
+        type: string
+        enum:
+          - known_model_locate
+          - known_category_locate
+          - grasp_pose_prediction
+          - unknown_object_locate
+          - approach_point_locate
+          - relative_point_locate
+      selection_reason: {type: string}
+      fallback_used: {type: boolean}
+
+  localization_result:
+    type: object
+    nullable: true
+    properties:
+      target_pose: {type: object}
+      object_pose: {type: object}
+      confidence: {type: float, range: [0.0, 1.0]}
+      source: {type: string}
+      candidates: {type: array, item_type: object}
+      grasp_metadata:
+        type: object
+        nullable: true
+        properties:
+          gripper_width: {type: float, unit: meter}
+          approach_direction: {type: array, item_type: float}
+          grasp_score: {type: float, range: [0.0, 1.0]}
+          predictor: {type: string}
+          target_instance_id: {type: string}
+      validation:
+        type: object
+        properties:
+          frame_valid: {type: boolean}
+          confidence_valid: {type: boolean}
+          reachable: {type: boolean}
+          collision_free: {type: boolean}
+          clearance: {type: float, unit: meter}
+      execution_time: {type: float, unit: second}
+
+  error:
+    type: object
+    nullable: true
+    properties:
+      error_code: {type: string}
+      error_message: {type: string}
+      failed_stage: {type: string}
+      recoverable: {type: boolean}
+      recommended_action: {type: string}

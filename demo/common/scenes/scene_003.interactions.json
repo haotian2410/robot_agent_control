@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "scene": "world_model/robotsim/scene_003.xml",
+  "move_defaults": {"motion": {"path_constraint": "soft", "phase": "transit"}, "planning": {"mode": "auto", "allow_replan": true, "planning_time": 8.0}, "constraints": {"avoid_collision": true, "velocity_scale": 0.6, "acceleration_scale": 0.6, "timeout": 30.0}, "strategy_params": {"ik_method": "trac_ik", "cartesian_step": 0.006}},
+  "adaptive_approach": {
+    "push_button_key": {"required": true, "anchors": ["target"], "direction_frame": "world", "direction": [0, 0, 1], "distance": 0.08, "pre_path_type": "joint", "final_path_type": "linear", "keep_orientation": true}
+  },
+  "named_targets": {"home": {"aliases": ["Home", "home", "初始位", "原点"], "request": {"target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]}}}},
+  "objects": {
+    "push_button_key": {
+      "object_id": "push_button_key", "body_name": "push_button_key", "aliases": ["红色按钮", "红按钮", "按钮"],
+      "spatial": {"source": {"type": "site", "name": "push_button_press_site"}, "reference_pose": {"position": [0.60, -0.35, 0.68], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "push_button_target", "aliases": ["按压位姿", "按压点", "表面", "按钮处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.02, "below": 0.02, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "push_button_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+      "default_interactions": {"press": "target"},
+      "action_requests": {
+        "press": {"target": {"type": "button", "object_id": "push_button_key", "surface_normal": [0.0, 0.0, 1.0]}, "press": {"strategy": "displacement_press", "control_mode": "displacement", "operation": "press", "direction_source": "surface_normal", "retract_after_press": true, "verification_mode": "position"}, "constraints": {"maximum_force": 100.0, "maximum_travel": 0.10, "contact_threshold": 0.2, "press_speed": 0.01, "retract_speed": 0.03, "hold_time": 0.5, "verify_press": true, "retry_count": 0, "timeout": 15.0, "require_contact": true, "emergency_retract": true}, "strategy_params": {"press_depth": 0.05, "stop_on_contact": false}}
+      }
+    }
+  }
+}

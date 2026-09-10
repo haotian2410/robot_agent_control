@@ -1,0 +1,19 @@
+name: push_pull
+version: "1.1"
+strategies:
+  linear_push_pull: {enabled: true}
+  circular_push_pull: {enabled: true}
+  free_object_push: {enabled: true}
+constraints:
+  maximum_force: 40.0
+  maximum_travel: 0.5
+  maximum_angle: 3.141592653589793
+  contact_threshold: 1.0
+  speed: 0.03
+  angular_speed: 0.2
+  timeout: 30.0
+  normal_alignment_tolerance: 1.0
+  avoid_collision: true
+  verify_motion: true
+  stop_on_contact_loss: true
+  emergency_retract: true

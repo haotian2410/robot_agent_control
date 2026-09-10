@@ -1,0 +1,70 @@
+name: PushPull
+version: "1.1"
+description: Execute a bounded mechanism push/pull or a non-grasped free-object push from a pre-contact pose.
+
+input:
+  target:
+    type: object
+    required: true
+    properties:
+      type:
+        type: string
+        required: true
+        enum: [object, mechanism]
+        description: Use object for a free body and mechanism for a grasped hinge or slider.
+      object_id: {type: string, required: true}
+      contact_point: {type: object}
+      contact_normal:
+        type: array
+        item_type: float
+        description: Initial contact normal in world/base coordinates. For free objects this is the outward surface normal.
+      normal_frame: {type: string, enum: [world, base], default: world}
+      expected_motion: {type: object}
+  manipulation:
+    type: object
+    required: true
+    properties:
+      operation: {type: string, enum: [push, pull, verify_only]}
+      trajectory: {type: string, enum: [auto, linear, circular]}
+      interaction_mode: {type: string, enum: [auto, mechanism, free_object], default: auto}
+      maintain_contact: {type: boolean, default: true}
+      verification_mode: {type: string, enum: [auto, object_pose, joint_state, contact, combined]}
+  constraints:
+    type: object
+    properties:
+      maximum_force: {type: float, unit: newton, default: 40.0}
+      maximum_travel: {type: float, unit: meter, default: 0.5}
+      maximum_angle: {type: float, unit: radian, default: 3.141592653589793}
+      contact_threshold: {type: float, unit: newton, default: 1.0}
+      speed: {type: float, unit: meter_per_second, default: 0.03}
+      angular_speed: {type: float, unit: radian_per_second, default: 0.2}
+      timeout: {type: float, unit: second, default: 30.0}
+      normal_alignment_tolerance: {type: float, unit: degree, default: 1.0}
+      avoid_collision: {type: boolean, default: true}
+      verify_motion: {type: boolean, default: true}
+      stop_on_contact_loss: {type: boolean, default: true}
+      emergency_retract: {type: boolean, default: true}
+  strategy_params:
+    type: object
+    properties:
+      direction: {type: array, item_type: float}
+      distance: {type: float, unit: meter}
+      arc_center: {type: array, item_type: float}
+      arc_axis: {type: array, item_type: float}
+      arc_angle: {type: float, unit: radian}
+      frame: {type: string, enum: [world, base]}
+      carried_objects:
+        type: array
+        item_type: string
+        description: Free bodies that are inside a kinematically moved drawer and must move with it.
+
+  validation_rules:
+    - when: manipulation.operation != verify_only
+      require: [target.contact_normal]
+
+output:
+  success: {type: boolean}
+  status: {type: string, enum: [completed, failed, timeout, stopped]}
+  selection: {type: object, nullable: true}
+  push_pull_result: {type: object, nullable: true}
+  error: {type: object, nullable: true}

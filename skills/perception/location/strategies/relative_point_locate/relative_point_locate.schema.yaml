@@ -1,0 +1,69 @@
+name: RelativePointLocate
+version: "2.0"
+
+description: Parameters specific to the Relative Point Locate Strategy.
+
+input:
+  reference_type:
+    type: string
+    enum: [end_effector, object, pose, frame]
+    description: Optional override; normally derived from locate.reference.type.
+
+  reference_id:
+    type: string
+
+  reference_pose:
+    type: object
+
+  offset_mode:
+    type: string
+    enum: [semantic, cartesian]
+    description: Optional override; normally derived from locate.offset.mode.
+
+  offset:
+    type: object
+    properties:
+      direction:
+        type: string
+        enum: [left, right, up, down, forward, backward]
+      distance: {type: float, unit: meter}
+      frame: {type: string, default: reference}
+      x: {type: float, unit: meter, default: 0.0}
+      y: {type: float, unit: meter, default: 0.0}
+      z: {type: float, unit: meter, default: 0.0}
+
+  default_offset:
+    type: float
+    unit: meter
+    range: [0.0, 10.0]
+    default: 0.05
+
+  semantic_direction_mapping:
+    type: object
+    properties:
+      left: {type: string}
+      right: {type: string}
+      up: {type: string}
+      down: {type: string}
+      forward: {type: string}
+      backward: {type: string}
+
+  orientation_mode:
+    type: string
+    default: keep_reference
+    enum: [keep_reference, align_with_reference, face_reference, specified]
+
+  specified_orientation:
+    type: object
+
+  search_radius:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.05
+
+validation_rules:
+  - require_any: [reference_type, locate.reference.type]
+  - require_any: [offset_mode, locate.offset.mode]
+  - when: orientation_mode == specified
+    require: [specified_orientation]

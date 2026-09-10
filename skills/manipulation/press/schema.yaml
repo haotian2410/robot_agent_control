@@ -1,0 +1,161 @@
+name: Press
+version: "1.0"
+
+description: >-
+  Execute a bounded local contact press using displacement or force control
+  after the robot has reached a pre-press pose.
+
+input:
+  target:
+    type: object
+    required: true
+    properties:
+      type:
+        type: string
+        required: true
+        enum: [press_pose, surface_point, button]
+      object_id: {type: string}
+      press_pose: {type: object}
+      press_point: {type: object}
+      press_direction: {type: object}
+      surface_normal:
+        type: object
+        description: Outward surface normal; Press executes along its negative direction.
+      expected_state_change: {type: object}
+
+  press:
+    type: object
+    default: {}
+    description: Task-level press intent used by the deterministic selector.
+    properties:
+      strategy:
+        type: string
+        default: auto
+        enum: [auto, displacement_press, force_controlled_press]
+      control_mode:
+        type: string
+        default: auto
+        enum: [auto, displacement, force]
+      operation:
+        type: string
+        default: press
+        enum: [press, verify_only]
+      direction_source:
+        type: string
+        default: target
+        enum: [target, surface_normal, specified]
+      retract_after_press: {type: boolean, default: true}
+      verification_mode:
+        type: string
+        default: auto
+        enum: [auto, force_profile, position, digital_io, visual, combined]
+
+  constraints:
+    type: object
+    default: {}
+    properties:
+      maximum_force: {type: float, unit: newton, range: [0.0, 10000.0], default: 30.0}
+      maximum_travel: {type: float, unit: meter, range: [0.0, 1.0], default: 0.03}
+      contact_threshold: {type: float, unit: newton, range: [0.0, 10000.0], default: 2.0}
+      approach_speed: {type: float, unit: meter_per_second, range: [0.0001, 1.0], default: 0.01}
+      press_speed: {type: float, unit: meter_per_second, range: [0.0001, 1.0], default: 0.01}
+      retract_speed: {type: float, unit: meter_per_second, range: [0.0001, 1.0], default: 0.02}
+      hold_time: {type: float, unit: second, range: [0.0, 600.0], default: 0.5}
+      verify_press: {type: boolean, default: true}
+      retry_count: {type: integer, range: [0, 10], default: 0}
+      timeout: {type: float, unit: second, range: [0.1, 600.0], default: 10.0}
+      force_tolerance: {type: float, unit: newton, range: [0.0, 10000.0], default: 1.0}
+      position_tolerance: {type: float, unit: meter, range: [0.0, 1.0], default: 0.001}
+      require_contact: {type: boolean, default: true}
+      emergency_retract: {type: boolean, default: true}
+      retract_distance: {type: float, unit: meter, range: [0.0, 1.0]}
+
+  strategy_params:
+    type: object
+    default: {}
+    description: >-
+      Parameters owned by the selected Press Strategy. The selected strategy
+      schema performs final strategy-specific validation.
+
+  runtime_context:
+    type: object
+    internal: true
+    properties:
+      current_end_effector_pose: {type: object}
+      current_joint_state: {type: object}
+      force_torque_state: {type: object}
+      tactile_state: {type: object}
+      contact_controller_state: {type: object}
+      robot_model: {type: object}
+      planning_scene: {type: object}
+      local_collision_state: {type: object}
+      tool_geometry: {type: object}
+      tool_compliance: {type: object}
+      target_state_sensor: {type: object}
+      digital_io_state: {type: object}
+      camera_observation: {type: object}
+      safety_state: {type: object}
+
+  validation_rules:
+    - require_any: [target.press_direction, target.surface_normal]
+    - when: press.direction_source == target
+      require: [target.press_direction]
+    - when: press.direction_source == surface_normal
+      require: [target.surface_normal]
+    - when: press.control_mode == displacement
+      require_any: [strategy_params.press_depth, strategy_params.travel_distance]
+    - when: press.control_mode == force
+      require: [strategy_params.target_force]
+      require_runtime_any: [force_torque_state, tactile_state]
+    - when: press.strategy == displacement_press
+      require_any: [strategy_params.press_depth, strategy_params.travel_distance]
+    - when: press.strategy == force_controlled_press
+      require: [strategy_params.target_force]
+      require_runtime_any: [force_torque_state, tactile_state]
+
+output:
+  success: {type: boolean}
+  status:
+    type: string
+    enum: [completed, failed, timeout, stopped]
+
+  selection:
+    type: object
+    nullable: true
+    properties:
+      press_strategy:
+        type: string
+        enum: [displacement_press, force_controlled_press]
+      selection_reason: {type: string}
+      retry_used: {type: boolean}
+
+  press_result:
+    type: object
+    nullable: true
+    properties:
+      contact_detected: {type: boolean}
+      target_force_reached: {type: boolean}
+      target_depth_reached: {type: boolean}
+      peak_force: {type: float, unit: newton}
+      final_force: {type: float, unit: newton}
+      travel_distance: {type: float, unit: meter}
+      hold_time: {type: float, unit: second}
+      target_actuated: {type: boolean}
+      verified: {type: boolean}
+      verification_method: {type: string}
+      retracted: {type: boolean}
+      final_pose: {type: object}
+      attempts: {type: integer}
+      evidence: {type: object}
+      execution_time: {type: float, unit: second}
+
+  error:
+    type: object
+    nullable: true
+    properties:
+      error_code: {type: string}
+      error_message: {type: string}
+      failed_stage: {type: string}
+      recoverable: {type: boolean}
+      recommended_action: {type: string}
+      details: {type: object, nullable: true}

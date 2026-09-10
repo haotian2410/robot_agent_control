@@ -1,0 +1,26 @@
+{
+  "registry": "../common/scenes/scene_001.interactions.json",
+  "commands": [
+    {"skill_name":"move","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"grasp","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"pull","parameters":{"target":"blue_cabinet_door"}},
+    {"skill_name":"release","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"move","parameters":{"target":"home"}},
+
+    {"skill_name":"move","parameters":{"target":"red_ball"}},
+    {"skill_name":"grasp","parameters":{"target":"red_ball"}},
+    {"skill_name":"move","parameters":{"target":"end_effector","relation":"above","distance_m":0.125,"planning_method":"linear"}},
+    {"skill_name":"move","parameters":{"target":"home"}},
+
+    {"skill_name":"move","parameters":{"target":"blue_cabinet_upper_compartment"}},
+    {"skill_name":"release","parameters":{"target":"red_ball"}},
+    {"skill_name":"move","parameters":{"target":"end_effector","relation":"behind","distance_m":0.23,"planning_method":"linear"}},
+    {"skill_name":"move","parameters":{"target":"home"}},
+
+    {"skill_name":"move","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"grasp","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"push","parameters":{"target":"blue_cabinet_door"}},
+    {"skill_name":"release","parameters":{"target":"blue_cabinet_handle"}},
+    {"skill_name":"move","parameters":{"target":"home"}}
+  ]
+}

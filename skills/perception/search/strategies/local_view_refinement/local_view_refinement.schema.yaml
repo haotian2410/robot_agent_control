@@ -1,0 +1,24 @@
+name: LocalViewRefinement
+version: "1.0"
+
+description: Parameters specific to the Local View Refinement Strategy.
+
+input:
+  translation_step: {type: float, unit: meter, range: [0.001, 10.0], default: 0.04}
+  rotation_step: {type: float, unit: degree, range: [0.1, 180.0], default: 10.0}
+  candidate_count: {type: integer, range: [1, 10000], default: 12}
+  optimize_for:
+    type: array
+    item_type: string
+    default: [target_centering, depth_coverage, pose_quality]
+  keep_target_in_view: {type: boolean, default: true}
+  maximum_local_radius: {type: float, unit: meter, range: [0.001, 10.0], default: 0.15}
+  perturbation_mode:
+    type: string
+    default: cartesian
+    enum: [cartesian, spherical, image_plane]
+
+validation_rules:
+  - when: search.search.strategy == local_view_refinement
+    require_any: [search.observation.bounding_box, search.observation.mask, search.observation.target_ray, search.observation.coarse_target_pose]
+  - require: [search.runtime_context.current_camera_pose]

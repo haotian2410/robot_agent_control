@@ -1,0 +1,385 @@
+{
+  "scene": "world_model/robotsim/scene_001.xml",
+  "runtime": {"end_effector_site": "robotiq_2f85_pinch", "execution_mode": "kinematic", "playback_fps": 60.0, "playback_speed": 2.0, "minimum_playback_duration": 1.0},
+  "viewer": {"azimuth": 135.0, "elevation": -25.0, "distance_scale": 1.4, "initial_pause": 1.0, "wait_for_key_between_steps": false, "continue_keys": ["SPACE", "ENTER"], "keep_open_after_last_test": true},
+  "request_defaults": {
+    "motion": {"path_constraint": "soft", "phase": "transit", "optimization_goal": "balanced"},
+    "planning": {"mode": "auto", "allow_replan": true, "planning_time": 8.0, "max_attempts": 3},
+    "constraints": {"avoid_collision": true, "velocity_scale": 0.8, "acceleration_scale": 0.8, "position_tolerance": 0.005, "orientation_tolerance": 2.0, "keep_end_effector_orientation": false, "safety_distance": 0.0, "timeout": 30.0},
+    "strategy_params": {"ik_method": "trac_ik", "cartesian_step": 0.01}
+  },
+  "steps": [
+    {
+      "name": "移动到闭合柜门把手前方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.3338747380, "y": -0.1987595078, "z": 0.81}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线接近闭合柜门把手",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.4304673206, "y": -0.2246414123, "z": 0.81}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "linear", "phase": "contact"},
+        "constraints": {"avoid_collision": true, "keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.005}
+      }
+    },
+    {
+      "name": "夹爪夹住闭合柜门把手",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "blue_cabinet_handle"},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false},
+        "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "夹爪夹持把手沿圆弧拉开柜门",
+      "type": "push_pull",
+      "request": {
+        "target": {"type": "mechanism", "object_id": "blue_cabinet_door", "contact_normal": [-0.9659258263, 0.2588190451, 0.0], "normal_frame": "world"},
+        "manipulation": {"operation": "pull", "trajectory": "circular", "maintain_contact": true, "verification_mode": "joint_state"},
+        "constraints": {"maximum_force": 40.0, "maximum_angle": 1.57079632679, "angular_speed": 0.8, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true},
+        "strategy_params": {"arc_center": [0.3788644397, -0.5524556016, 0.81], "arc_axis": [0.0, 0.0, 1.0], "arc_angle": 1.57079632679, "frame": "world"}
+      }
+    },
+    {
+      "name": "打开柜门后松开把手",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "blue_cabinet_handle"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}
+      }
+    },
+    {
+      "name": "关节运动回到Home",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {"target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]}, "motion": {"path_type": "joint"}}
+    },
+    {
+      "name": "直线运动到小球上方10cm",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.48, "y": 0.42, "z": 0.795}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
+        "motion": {"path_type": "linear"}
+      }
+    },
+    {
+      "name": "直线下探到小球处",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.48, "y": 0.42, "z": 0.67}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
+        "motion": {"path_type": "linear"},
+        "constraints": {"avoid_collision": false, "keep_end_effector_orientation": true}
+      }
+    },
+    {
+      "name": "闭合夹爪抓取红球",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "red_ball", "expected_width": 0.05},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 1, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": true},
+        "strategy_params": {"open_width": 0.08, "close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "position_tolerance": 0.01, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "抓取后直线抬升到小球上方10cm",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.48, "y": 0.42, "z": 0.795}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
+        "motion": {"path_type": "linear"}
+      }
+    },
+    {
+      "name": "关节运动到柜子上层前方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {
+          "type": "pose",
+          "frame": "world",
+          "position": {"x": 0.2902222522, "y": -0.3423542865, "z": 0.86},
+          "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}
+        },
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线伸入柜子上层",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.5123851922, "y": -0.4018826669, "z": 0.86}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "linear"},
+        "strategy_params": {"cartesian_step": 0.006},
+        "constraints": {"keep_end_effector_orientation": true}
+      }
+    },
+    {
+      "name": "张开夹爪将红球放入柜子上层",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "red_ball"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": true}
+      },
+      "object_body": "red_ball_body",
+      "verify_region": {"min": [0.40, -0.58, 0.82], "max": [0.70, -0.20, 1.02]}
+    },
+    {
+      "name": "放入小球后直线退出原柜子上层",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.2902222522, "y": -0.3423542865, "z": 0.86}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "linear", "phase": "retreat"},
+        "constraints": {"keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.006}
+      }
+    },
+    {
+      "name": "移动到新柜子上层抽屉把手前方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.505, "y": 0.10, "z": 0.855}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线接近新柜子上层抽屉把手",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.605, "y": 0.10, "z": 0.855}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+        "motion": {"path_type": "linear", "phase": "contact"},
+        "constraints": {"avoid_collision": false, "keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.005}
+      }
+    },
+    {
+      "name": "夹爪夹住上层抽屉把手",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false},
+        "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "夹爪沿直线拉开上层抽屉",
+      "type": "push_pull",
+      "request": {
+        "target": {"type": "mechanism", "object_id": "small_cabinet_upper_drawer", "contact_normal": [-1.0, 0.0, 0.0], "normal_frame": "world"},
+        "manipulation": {"operation": "pull", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"},
+        "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true},
+        "strategy_params": {"direction": [-1.0, 0.0, 0.0], "distance": 0.18, "frame": "world", "carried_objects": ["drawer_cube_body"]}
+      }
+    },
+    {
+      "name": "打开抽屉后松开把手",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}
+      }
+    },
+    {
+      "name": "松开抽屉把手后沿直线安全撤离",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.345, "y": 0.10, "z": 0.855}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+        "motion": {"path_type": "linear", "phase": "retreat"},
+        "constraints": {"avoid_collision": false, "keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.005}
+      }
+    },
+    {
+      "name": "移动到抽屉内方块上方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.57, "y": 0.10, "z": 0.95}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线下探到抽屉内方块",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.57, "y": 0.10, "z": 0.834}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+        "motion": {"path_type": "linear", "phase": "contact"},
+        "constraints": {"avoid_collision": false, "keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.005}
+      }
+    },
+    {
+      "name": "夹爪抓取抽屉内方块",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "drawer_cube", "expected_width": 0.05},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 1, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": true},
+        "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "position_tolerance": 0.01, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "抓取后直线抬升抽屉内方块",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.57, "y": 0.10, "z": 0.95}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 0.0}},
+        "motion": {"path_type": "linear"},
+        "constraints": {"keep_end_effector_orientation": true}
+      }
+    },
+    {
+      "name": "移动方块到原柜子下层前方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.2902222522, "y": -0.3423542865, "z": 0.70}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线伸入原柜子下层",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.5123851922, "y": -0.4018826669, "z": 0.70}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "linear"},
+        "strategy_params": {"cartesian_step": 0.006},
+        "constraints": {"keep_end_effector_orientation": true}
+      }
+    },
+    {
+      "name": "张开夹爪将方块放入原柜子下层",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "drawer_cube"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": true}
+      },
+      "object_body": "drawer_cube_body",
+      "verify_region": {"min": [0.40, -0.58, 0.63], "max": [0.70, -0.20, 0.79]}
+    },
+    {
+      "name": "放入方块后直线退出原柜子下层",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.2902222522, "y": -0.3423542865, "z": 0.70}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
+        "motion": {"path_type": "linear", "phase": "retreat"},
+        "constraints": {"keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.006}
+      }
+    },
+    {
+      "name": "移动到拉出状态的上层抽屉把手前方",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.345, "y": 0.10, "z": 0.855}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "直线接近拉出状态的上层抽屉把手",
+      "type": "move",
+      "allow_path_change": false,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.425, "y": 0.10, "z": 0.855}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+        "motion": {"path_type": "linear", "phase": "contact"},
+        "constraints": {"avoid_collision": false, "keep_end_effector_orientation": true},
+        "strategy_params": {"cartesian_step": 0.005}
+      }
+    },
+    {
+      "name": "夹爪重新夹住上层抽屉把手",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false},
+        "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "夹爪沿反向直线推回上层抽屉",
+      "type": "push_pull",
+      "request": {
+        "target": {"type": "mechanism", "object_id": "small_cabinet_upper_drawer", "contact_normal": [-1.0, 0.0, 0.0], "normal_frame": "world"},
+        "manipulation": {"operation": "push", "trajectory": "linear", "maintain_contact": true, "verification_mode": "joint_state"},
+        "constraints": {"maximum_force": 40.0, "maximum_travel": 0.18, "speed": 0.08, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true},
+        "strategy_params": {"direction": [1.0, 0.0, 0.0], "distance": 0.18, "frame": "world"}
+      }
+    },
+    {
+      "name": "抽屉推回后松开把手",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "small_cabinet_upper_drawer_handle"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}
+      }
+    },
+    {
+      "name": "小球放入后移动到打开状态的柜门把手",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "pose", "frame": "world", "position": {"x": 0.0510502505, "y": -0.5008527207, "z": 0.81}, "orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 75.0}},
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "夹爪夹住打开状态的柜门把手",
+      "type": "grasp",
+      "request": {
+        "target": {"type": "object", "object_id": "blue_cabinet_handle"},
+        "grasp": {"strategy": "auto", "operation": "regrasp", "verification_mode": "auto"},
+        "constraints": {"verify_grasp": true, "retry_count": 0, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": false},
+        "strategy_params": {"close_width": 0.0, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0, "settle_time": 0.0}
+      }
+    },
+    {
+      "name": "夹爪夹持把手沿反向圆弧关闭柜门",
+      "type": "push_pull",
+      "request": {
+        "target": {"type": "mechanism", "object_id": "blue_cabinet_door", "contact_normal": [-0.2588190451, -0.9659258263, 0.0], "normal_frame": "world"},
+        "manipulation": {"operation": "push", "trajectory": "circular", "maintain_contact": true, "verification_mode": "joint_state"},
+        "constraints": {"maximum_force": 40.0, "maximum_angle": 1.57079632679, "angular_speed": 0.8, "timeout": 10.0, "normal_alignment_tolerance": 1.0, "verify_motion": true, "stop_on_contact_loss": true, "emergency_retract": true, "avoid_collision": true},
+        "strategy_params": {"arc_center": [0.3788644397, -0.5524556016, 0.81], "arc_axis": [0.0, 0.0, 1.0], "arc_angle": -1.57079632679, "frame": "world"}
+      }
+    },
+    {
+      "name": "关闭柜门后松开把手",
+      "type": "release",
+      "request": {
+        "target": {"type": "object", "object_id": "blue_cabinet_handle"},
+        "constraints": {"open_width": 0.08, "timeout": 5.0, "verify_release": false}
+      }
+    },
+    {
+      "name": "关闭柜门后机械臂回到Home并结束",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]},
+        "motion": {"path_type": "joint"}
+      }
+    }
+  ]
+}

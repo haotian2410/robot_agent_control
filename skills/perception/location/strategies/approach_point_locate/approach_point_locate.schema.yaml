@@ -1,0 +1,69 @@
+name: ApproachPointLocate
+version: "2.0"
+
+description: Parameters specific to the Approach Point Locate Strategy.
+
+input:
+  target_pose:
+    type: object
+    description: Optional override; normally derived from reference.pose.
+
+  approach_direction:
+    type: object
+    required: true
+    properties:
+      type:
+        type: string
+        default: vector
+        enum: [vector, semantic, surface_normal]
+      frame: {type: string, default: target}
+      x: {type: float}
+      y: {type: float}
+      z: {type: float}
+      semantic:
+        type: string
+        enum: [left, right, up, down, forward, backward]
+
+  approach_distance:
+    type: float
+    unit: meter
+    range: [0.0001, 10.0]
+    default: 0.10
+
+  direction_frame:
+    type: string
+    default: target
+
+  orientation_mode:
+    type: string
+    default: keep_target
+    enum: [keep_target, align_with_direction, specified]
+
+  specified_orientation:
+    type: object
+
+  search_radius:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.05
+
+  candidate_count:
+    type: integer
+    range: [1, 1000]
+    default: 10
+
+  minimum_clearance:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.02
+
+validation_rules:
+  - require_any: [target_pose, locate.reference.pose]
+  - when: approach_direction.type == vector
+    require: [approach_direction.x, approach_direction.y, approach_direction.z]
+  - when: approach_direction.type == semantic
+    require: [approach_direction.semantic]
+  - when: orientation_mode == specified
+    require: [specified_orientation]

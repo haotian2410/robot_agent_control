@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "scene": "world_model/robotsim/scene_002.xml",
+  "move_defaults": {"motion": {"path_constraint": "soft", "phase": "transit", "optimization_goal": "balanced"}, "planning": {"mode": "auto", "allow_replan": true, "planning_time": 10.0, "max_attempts": 3}, "constraints": {"avoid_collision": true, "velocity_scale": 0.8, "acceleration_scale": 0.8, "position_tolerance": 0.005, "orientation_tolerance": 2.0, "keep_end_effector_orientation": false, "safety_distance": 0.0, "timeout": 30.0}, "strategy_params": {"ik_method": "trac_ik", "cartesian_step": 0.008}},
+  "adaptive_approach": {
+    "glass_cup": {"required": true, "anchors": ["grasp"], "direction_frame": "world", "direction": [0, 0, 1], "distance": 0.10, "pre_path_type": "joint", "final_path_type": "linear", "keep_orientation": true},
+    "serving_tray": {"required": true, "anchors": ["place"], "direction_frame": "world", "direction": [0, 0, 1], "distance": 0.26, "pre_path_type": "joint", "final_path_type": "linear", "keep_orientation": true},
+    "orange_ball": {"required": true, "anchors": ["grasp"], "direction_frame": "world", "direction": [0, 0, 1], "distance": 0.163, "pre_path_type": "joint", "final_path_type": "linear", "keep_orientation": true}
+  },
+  "named_targets": {"home": {"aliases": ["Home", "home", "初始位", "原点"], "request": {"target": {"type": "joint", "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]}}}},
+  "objects": {
+    "glass_cup": {
+      "object_id": "glass_cup", "body_name": "glass_cup", "aliases": ["盛水玻璃杯", "玻璃杯", "杯子"],
+      "spatial": {"source": {"type": "body", "name": "glass_cup"}, "reference_pose": {"position": [0.48, 0.46, 0.60], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "glass_cup_target", "local_position": [0, 0, 0.06], "aliases": ["杯身", "目标处"]}, "grasp": {"target_id": "glass_cup_grasp", "local_position": [0, 0, 0.06], "aliases": ["抓取位姿", "玻璃杯处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.29, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "glass_cup_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "default_interactions": {"grasp": "grasp"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "glass_cup", "expected_width": 0.058}, "grasp": {"operation": "grasp"}, "constraints": {"verify_grasp": true, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true}, "strategy_params": {"open_width": 0.085, "close_width": 0.04, "close_speed": 0.4, "grasp_force": 18.0, "hold_force": 12.0}},
+        "release": {"target": {"type": "object", "object_id": "glass_cup"}, "constraints": {"open_width": 0.085, "timeout": 5.0, "verify_release": true}}
+      }
+    },
+    "orange_ball": {
+      "object_id": "orange_ball", "body_name": "orange_ball", "aliases": ["橙色小球", "橙球"],
+      "spatial": {"source": {"type": "body", "name": "orange_ball"}, "reference_pose": {"position": [0.48, 0.25, 0.618], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "orange_ball_target", "local_position": [0, 0, 0.014], "aliases": ["目标处", "物体处"]}, "grasp": {"target_id": "orange_ball_grasp", "local_position": [0, 0, 0.014], "aliases": ["抓取位姿", "橙球处", "球处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.163, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "orange_ball_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
+      "default_interactions": {"grasp": "grasp"},
+      "action_requests": {
+        "grasp": {"target": {"type": "object", "object_id": "orange_ball", "expected_width": 0.036}, "grasp": {"operation": "grasp"}, "constraints": {"verify_grasp": true, "retry_count": 1, "hold_on_success": true, "timeout": 5.0, "maximum_force": 40.0, "contact_required": true, "slip_check": true}, "strategy_params": {"open_width": 0.085, "close_width": 0.02, "close_speed": 0.5, "grasp_force": 20.0, "hold_force": 10.0}},
+        "release": {"target": {"type": "object", "object_id": "orange_ball"}, "constraints": {"open_width": 0.085, "timeout": 3.0, "verify_release": false}}
+      }
+    },
+    "serving_tray": {
+      "object_id": "serving_tray", "body_name": "serving_tray", "aliases": ["托盘", "餐盘"],
+      "spatial": {"source": {"type": "body", "name": "serving_tray"}, "reference_pose": {"position": [0.56, -0.43, 0.60], "quaternion_wxyz": [1, 0, 0, 0]}, "default_anchor": "place", "anchors": {"place": {"target_id": "serving_tray_place", "local_position": [0, 0, 0.09], "aliases": ["放置位姿", "托盘处", "表面"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.26, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "serving_tray_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 0.0}},
+      "action_requests": {}
+    }
+  }
+}

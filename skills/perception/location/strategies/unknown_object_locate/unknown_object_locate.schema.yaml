@@ -1,0 +1,45 @@
+name: UnknownObjectLocate
+version: "2.0"
+
+description: Parameters specific to the Unknown Object Locate Strategy.
+
+input:
+  target_description:
+    type: string
+    description: Optional override; normally derived from target.object or target.instruction.
+
+  vlm_model:
+    type: string
+    default: auto
+
+  point_selection_mode:
+    type: string
+    default: point
+    enum: [point, region, region_center]
+
+  depth_sampling_radius:
+    type: integer
+    unit: pixel
+    range: [0, 1000]
+    default: 5
+
+  depth_aggregation:
+    type: string
+    default: median
+    enum: [median, mean, nearest_valid]
+
+  minimum_valid_depth_points:
+    type: integer
+    range: [1, 1000000]
+    default: 3
+
+  orientation_estimation:
+    type: boolean
+    default: true
+
+  operation_point_rule:
+    type: string
+    default: auto
+
+validation_rules:
+  - require_any: [target_description, locate.target.object, locate.target.instruction]

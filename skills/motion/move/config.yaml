@@ -1,0 +1,112 @@
+name: move
+version: "2.0"
+
+description: Default configuration for the executable MuJoCo Move Skill.
+
+move:
+  default_frame: base
+  default_path_type: auto
+  default_path_constraint: soft
+  default_phase: transit
+  default_optimization_goal: balanced
+
+  execution:
+    enable_state_check: true
+    wait_for_controller: true
+    stop_on_error: true
+    verify_goal_after_execution: true
+    stop_on_scene_change: true
+
+selector:
+  pose_transit_default: joint_move
+  phase_defaults:
+    transit: joint_move
+    approach: linear_move
+    retreat: linear_move
+    contact: linear_move
+  require_arc_geometry_for_circular: true
+  explicit_request_has_priority: true
+  safety_can_override_selection: true
+
+strategies:
+  joint_move:
+    enabled: true
+    schema: strategies/joint_move/joint_move.schema.yaml
+    defaults:
+      interpolation: quintic
+      ik_solution_policy: nearest
+      preserve_current_configuration: true
+
+  linear_move:
+    enabled: true
+    schema: strategies/linear_move/linear_move.schema.yaml
+    defaults:
+      cartesian_step: 0.01
+      orientation_mode: fixed
+      jump_threshold: 0.0
+      min_path_fraction: 0.98
+
+  circular_move:
+    enabled: true
+    schema: strategies/circular_move/circular_move.schema.yaml
+    defaults:
+      cartesian_step: 0.01
+      orientation_mode: tangent
+      min_path_fraction: 0.98
+
+planning:
+  default_mode: auto
+  direct:
+    enabled: true
+    validate_before_execution: true
+
+  collision_free:
+    enabled: true
+    default_planner: rrt_connect
+    planning_time: 5.0
+    max_attempts: 3
+    optimize_path: true
+    smooth_result: true
+    allow_path_type_relaxation_only_for_soft_constraint: true
+
+  replanning:
+    enabled: true
+    max_replans: 2
+    scene_change_threshold: implementation_defined
+
+collision:
+  enabled: true
+  self_collision_check: true
+  environment_collision_check: true
+  continuous_collision_check: true
+  phase_safety_distance:
+    transit: 0.05
+    approach: 0.02
+    retreat: 0.02
+    contact: 0.005
+
+trajectory:
+  smoothing:
+    enabled: true
+    method: implementation_defined
+
+  velocity:
+    default_scale: 0.5
+    global_limit_scale: 1.0
+
+  acceleration:
+    default_scale: 0.5
+    global_limit_scale: 1.0
+
+  constraints:
+    keep_end_effector_orientation: false
+
+robot:
+  joint_limit_check: true
+  workspace_check: true
+  singularity_check: true
+  controller_ready_check: true
+  named_states:
+    home: [0.0, -1.5708, 1.5708, -1.5708, -1.5708, 0.0]
+    ready: [0.0, -1.2, 1.4, -1.75, -1.5708, 0.0]
+    park: [0.0, -1.5708, 0.0, -1.5708, 0.0, 0.0]

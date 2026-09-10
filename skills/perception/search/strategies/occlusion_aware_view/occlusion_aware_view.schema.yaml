@@ -1,0 +1,29 @@
+name: OcclusionAwareView
+version: "1.0"
+
+description: Parameters specific to the Occlusion-Aware View Strategy.
+
+input:
+  orbit_radius: {type: float, unit: meter, range: [0.01, 100.0], default: 0.35}
+  azimuth_offsets:
+    type: array
+    item_type: float
+    unit: degree
+    default: [-45, -30, -15, 15, 30, 45]
+  elevation_offsets:
+    type: array
+    item_type: float
+    unit: degree
+    default: [0, 15, 30]
+  candidate_count: {type: integer, range: [1, 10000], default: 18}
+  keep_target_in_view: {type: boolean, default: true}
+  minimum_expected_occlusion_reduction: {type: float, range: [0.0, 1.0], default: 0.1}
+  occluder_clearance: {type: float, unit: meter, range: [0.0, 10.0], default: 0.05}
+  visibility_evaluator:
+    type: string
+    default: auto
+    enum: [auto, ray_cast, depth_render, learned, heuristic]
+
+validation_rules:
+  - require_any: [search.observation.coarse_target_pose, search.observation.target_ray, search.target.prior_pose, search.runtime_context.target_prior.pose]
+  - require_any: [search.observation.occlusion_ratio, search.observation.occluder, search.runtime_context.perception_result.occlusion, search.runtime_context.vlm_result.occlusion]

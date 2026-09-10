@@ -1,0 +1,31 @@
+name: SystematicScan
+version: "1.0"
+
+description: Parameters specific to the Systematic Scan Strategy.
+
+input:
+  scan_pattern:
+    type: string
+    default: z_scan
+    enum: [horizontal, vertical, z_scan, grid, orbit, viewpoint_set]
+  scan_axis:
+    type: string
+    default: horizontal
+    enum: [horizontal, vertical]
+  scan_step: {type: float, unit: meter, range: [0.001, 10.0], default: 0.08}
+  row_step: {type: float, unit: meter, range: [0.001, 10.0], default: 0.08}
+  candidate_count: {type: integer, range: [1, 10000], default: 20}
+  look_at_mode:
+    type: string
+    default: region_center
+    enum: [region_center, fixed_direction, candidate_normal, none]
+  skip_visited: {type: boolean, default: true}
+  start_corner:
+    type: string
+    default: auto
+    enum: [auto, left_top, left_bottom, right_top, right_bottom]
+
+validation_rules:
+  - require_any: [search.search_region.type, search.runtime_context.default_search_region]
+  - when: scan_pattern == viewpoint_set
+    require_any: [search.search_region.viewpoints, search.runtime_context.default_search_region.viewpoints]

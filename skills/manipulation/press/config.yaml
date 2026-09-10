@@ -1,0 +1,74 @@
+name: press
+version: "2.0"
+description: Default configuration for Press Skill execution.
+
+press:
+  default_strategy: auto
+  default_control_mode: auto
+  default_operation: press
+  default_direction_source: target
+  retract_after_press: true
+  default_verification_mode: auto
+
+selection:
+  explicit_strategy_priority: true
+  prefer_force_when_target_force_available: true
+  never_silently_degrade_force_to_displacement: true
+  fallback:
+    enabled: false
+
+strategies:
+  displacement_press:
+    enabled: true
+    schema: strategies/displacement_press/displacement_press.schema.yaml
+    defaults:
+      press_depth: 0.005
+      stop_on_contact: false
+      post_contact_depth: 0.003
+      motion_profile: constant_velocity
+
+  force_controlled_press:
+    enabled: true
+    schema: strategies/force_controlled_press/force_controlled_press.schema.yaml
+    defaults:
+      target_force: 10.0
+      contact_force: 2.0
+      force_ramp_rate: 20.0
+      force_settle_time: 0.2
+
+constraints:
+  maximum_force: 30.0
+  maximum_travel: 0.03
+  contact_threshold: 2.0
+  approach_speed: 0.01
+  press_speed: 0.01
+  retract_speed: 0.02
+  hold_time: 0.5
+  verify_press: true
+  retry_count: 0
+  timeout: 10.0
+  force_tolerance: 1.0
+  position_tolerance: 0.001
+  require_contact: true
+  emergency_retract: true
+
+validation:
+  require_controller_ready: true
+  require_safe_robot_state: true
+  require_valid_press_direction: true
+  normalize_press_direction: true
+  require_local_collision_check: true
+  require_force_sensor_for_force_control: true
+  verify_target_actuation: true
+
+retry:
+  enabled: true
+  require_recoverable_error: true
+  require_successful_retract: true
+  require_safe_state: true
+  maximum_retry_count: 2
+
+runtime:
+  require_synchronized_state: true
+  require_contact_controller_state: true
+  require_tool_geometry: true

@@ -1,0 +1,66 @@
+name: CircularMove
+version: "2.0"
+
+description: Parameters specific to the Circular Move Path Strategy.
+
+input:
+  arc_definition_mode:
+    type: string
+    required: true
+    enum: [via_point, center_axis]
+
+  via_point:
+    type: object
+    properties:
+      frame: {type: string, default: base}
+      position: {type: object}
+      orientation: {type: object}
+
+  arc_center:
+    type: object
+    properties:
+      frame: {type: string, default: base}
+      x: {type: float, unit: meter}
+      y: {type: float, unit: meter}
+      z: {type: float, unit: meter}
+
+  arc_axis:
+    type: object
+    properties:
+      frame: {type: string, default: base}
+      x: {type: float}
+      y: {type: float}
+      z: {type: float}
+
+  arc_angle:
+    type: float
+    unit: degree
+    range: [-360.0, 360.0]
+
+  radius:
+    type: float
+    unit: meter
+    range: [0.0001, 10.0]
+    description: Optional consistency check or explicit radius.
+
+  cartesian_step:
+    type: float
+    unit: meter
+    range: [0.0001, 0.1]
+    default: 0.01
+
+  orientation_mode:
+    type: string
+    default: tangent
+    enum: [fixed, interpolate, tangent, radial]
+
+  min_path_fraction:
+    type: float
+    range: [0.0, 1.0]
+    default: 0.98
+
+validation_rules:
+  - when: arc_definition_mode == via_point
+    require: [via_point]
+  - when: arc_definition_mode == center_axis
+    require: [arc_center, arc_axis, arc_angle]

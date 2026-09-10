@@ -1,0 +1,45 @@
+name: KnownCategoryLocate
+version: "2.0"
+
+description: Parameters specific to the Known Category Locate Strategy.
+
+input:
+  category:
+    type: string
+    description: Optional override; normally derived from target.category or runtime target prior.
+
+  detector_model:
+    type: string
+    default: auto
+
+  detection_threshold:
+    type: float
+    range: [0.0, 1.0]
+    default: 0.5
+
+  segmentation_method:
+    type: string
+    default: auto
+    enum: [auto, instance_segmentation, prompt_segmentation, bounding_box_mask]
+
+  instance_selection:
+    type: string
+    default: highest_confidence
+    enum: [highest_confidence, nearest, image_center, instruction, instance_id]
+
+  minimum_point_count:
+    type: integer
+    range: [1, 1000000]
+    default: 50
+
+  pose_estimation_method:
+    type: string
+    default: auto
+    enum: [auto, centroid, pca, registration, surface_normal]
+
+  operation_point_rule:
+    type: string
+    default: auto
+
+validation_rules:
+  - require_any: [category, locate.target.category, locate.runtime_context.target_prior.category]

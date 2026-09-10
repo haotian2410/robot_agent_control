@@ -1,0 +1,262 @@
+name: Search
+version: "1.0"
+
+description: >-
+  Select the next camera viewpoint for active visual search when a target is
+  not visible, partially occluded, or insufficiently observed.
+
+input:
+  target:
+    type: object
+    required: true
+    description: Target whose visibility or observation quality should be improved.
+    properties:
+      object: {type: string}
+      instruction: {type: string}
+      instance_id: {type: string}
+      category: {type: string}
+      model_id: {type: string}
+      prior_pose: {type: object}
+      prior_region: {type: object}
+
+  trigger:
+    type: object
+    default: {}
+    description: Upstream reason for requesting active view search.
+    properties:
+      reason:
+        type: string
+        enum: [target_not_found, partially_visible, low_confidence, poor_depth, poor_geometry, inspection_required]
+      source_skill: {type: string}
+      source_error_code: {type: string}
+
+  observation:
+    type: object
+    required: true
+    description: Target visibility and quality in the current camera observation.
+    properties:
+      visibility:
+        type: string
+        required: true
+        enum: [visible, partial, not_visible, unknown]
+      confidence:
+        type: float
+        range: [0.0, 1.0]
+        default: 0.0
+      bounding_box: {type: object}
+      mask: {type: object}
+      target_ray: {type: object}
+      coarse_target_pose: {type: object}
+      occlusion_ratio:
+        type: float
+        range: [0.0, 1.0]
+      occluder: {type: object}
+      image_edge_hint:
+        type: string
+        enum: [left, right, top, bottom, none]
+      direction_hint: {type: object}
+      quality:
+        type: object
+        default: {}
+        properties:
+          depth_coverage: {type: float, range: [0.0, 1.0]}
+          sharpness: {type: float, range: [0.0, 1.0]}
+          target_centering: {type: float, range: [0.0, 1.0]}
+          pose_quality: {type: float, range: [0.0, 1.0]}
+
+  camera:
+    type: object
+    required: true
+    properties:
+      id: {type: string, required: true}
+      mount_type:
+        type: string
+        required: true
+        enum: [wrist, head, pan_tilt, mobile, movable_external, fixed_external]
+      optical_frame: {type: string, required: true}
+      current_pose: {type: object}
+      controlled_by:
+        type: string
+        enum: [move, camera_controller, base_move, none]
+
+  search:
+    type: object
+    default: {}
+    properties:
+      strategy:
+        type: string
+        default: auto
+        enum: [auto, systematic_scan, prior_guided_search, occlusion_aware_view, local_view_refinement]
+      goal:
+        type: string
+        default: locate
+        enum: [locate, identify, pose_estimation, inspect]
+      mode:
+        type: string
+        default: single_step
+        enum: [single_step, iterative]
+      output_frame: {type: string, default: base}
+      candidate_selection:
+        type: string
+        default: highest_score
+        enum: [highest_score, max_information, min_motion, safest]
+      max_candidates:
+        type: integer
+        range: [1, 1000]
+        default: 20
+      max_steps:
+        type: integer
+        range: [1, 1000]
+        default: 8
+      allow_fallback: {type: boolean, default: true}
+
+  search_region:
+    type: object
+    default: {}
+    properties:
+      type:
+        type: string
+        enum: [named_region, box, sphere, around_prior, viewpoint_set]
+      frame: {type: string, default: base}
+      id: {type: string}
+      center: {type: object}
+      size: {type: object}
+      radius: {type: float, unit: meter, range: [0.0, 100.0]}
+      viewpoints: {type: array, item_type: object}
+
+  constraints:
+    type: object
+    default: {}
+    properties:
+      confidence_threshold: {type: float, range: [0.0, 1.0], default: 0.7}
+      quality_threshold: {type: float, range: [0.0, 1.0], default: 0.6}
+      check_reachability: {type: boolean, default: true}
+      avoid_collision: {type: boolean, default: true}
+      minimum_clearance: {type: float, unit: meter, range: [0.0, 10.0], default: 0.03}
+      min_view_distance: {type: float, unit: meter, range: [0.0, 100.0], default: 0.15}
+      max_view_distance: {type: float, unit: meter, range: [0.0, 100.0], default: 1.50}
+      max_translation: {type: float, unit: meter, range: [0.0, 100.0]}
+      max_rotation: {type: float, unit: degree, range: [0.0, 360.0]}
+      keep_target_in_view: {type: boolean, default: true}
+      require_look_at_target: {type: boolean, default: true}
+      timeout: {type: float, unit: second, range: [0.1, 600.0], default: 30.0}
+
+  history:
+    type: object
+    default: {}
+    properties:
+      step_index: {type: integer, range: [0, 1000000], default: 0}
+      visited_viewpoints: {type: array, item_type: object}
+      failed_viewpoints: {type: array, item_type: object}
+      previous_observations: {type: array, item_type: object}
+      no_improvement_steps: {type: integer, range: [0, 1000000], default: 0}
+      best_observation: {type: object}
+
+  strategy_params:
+    type: object
+    default: {}
+    description: >-
+      Parameters owned by the selected Search Strategy. The selected strategy
+      schema performs final strategy-specific validation.
+
+  runtime_context:
+    type: object
+    internal: true
+    description: Populated by the robot runtime rather than generated by the Agent.
+    properties:
+      rgb_image: {type: object}
+      depth_image: {type: object}
+      camera_info: {type: object}
+      current_camera_pose: {type: object}
+      camera_to_end_effector: {type: object}
+      transform_tree: {type: object}
+      robot_state: {type: object}
+      robot_model: {type: object}
+      planning_scene: {type: object}
+      scene_geometry: {type: object}
+      semantic_map: {type: object}
+      target_prior: {type: object}
+      tracking_prediction: {type: object}
+      perception_result: {type: object}
+      vlm_result: {type: object}
+
+  validation_rules:
+    - require_any: [target.object, target.instruction, target.instance_id, target.category, target.model_id, target.prior_pose, target.prior_region]
+    - when: search.strategy == systematic_scan
+      require: [search_region.type]
+    - when: search.strategy == prior_guided_search
+      require_any: [target.prior_pose, target.prior_region, observation.direction_hint, observation.image_edge_hint, runtime_context.target_prior, runtime_context.tracking_prediction]
+    - when: search.strategy == occlusion_aware_view
+      require_any: [observation.coarse_target_pose, observation.target_ray, target.prior_pose]
+    - when: camera.mount_type == wrist
+      require_any: [runtime_context.camera_to_end_effector]
+
+output:
+  success: {type: boolean}
+
+  status:
+    type: string
+    enum: [completed, failed, timeout, exhausted]
+
+  selection:
+    type: object
+    nullable: true
+    properties:
+      search_strategy:
+        type: string
+        nullable: true
+        enum: [systematic_scan, prior_guided_search, occlusion_aware_view, local_view_refinement]
+      search_required: {type: boolean}
+      selection_reason: {type: string}
+      fallback_used: {type: boolean}
+
+  search_result:
+    type: object
+    nullable: true
+    properties:
+      next_viewpoint:
+        type: object
+        nullable: true
+        properties:
+          camera_pose: {type: object}
+          look_at_point: {type: object}
+          control_target:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [end_effector_pose, camera_pose, pan_tilt, base_pose]
+              pose: {type: object}
+              joints: {type: object}
+      expected_visibility_gain: {type: float}
+      expected_information_gain: {type: float}
+      score: {type: float}
+      candidates: {type: array, item_type: object}
+      validation:
+        type: object
+        properties:
+          frame_valid: {type: boolean}
+          field_of_view_valid: {type: boolean}
+          history_valid: {type: boolean}
+          reachable: {type: boolean}
+          collision_free: {type: boolean}
+          clearance: {type: float, unit: meter}
+          motion_cost: {type: float}
+      search_state:
+        type: object
+        properties:
+          step_index: {type: integer}
+          should_continue: {type: boolean}
+          remaining_steps: {type: integer}
+          stop_reason: {type: string}
+      execution_request: {type: object}
+
+  error:
+    type: object
+    nullable: true
+    properties:
+      error_code: {type: string}
+      error_message: {type: string}
+      failed_stage: {type: string}
+      recoverable: {type: boolean}
+      recommended_action: {type: string}

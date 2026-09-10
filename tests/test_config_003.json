@@ -1,0 +1,115 @@
+{
+  "scene": "world_model/robotsim/scene_003.xml",
+  "runtime": {
+    "end_effector_site": "robotiq_2f85_pinch",
+    "execution_mode": "kinematic",
+    "playback_fps": 60.0,
+    "playback_speed": 1.0,
+    "minimum_playback_duration": 1.0
+  },
+  "viewer": {
+    "azimuth": 135.0,
+    "elevation": -25.0,
+    "distance_scale": 1.4,
+    "initial_pause": 1.0,
+    "wait_for_key_between_steps": false,
+    "continue_keys": ["SPACE", "ENTER"],
+    "keep_open_after_last_test": true
+  },
+  "request_defaults": {
+    "motion": {
+      "path_constraint": "soft",
+      "phase": "transit",
+      "optimization_goal": "balanced"
+    },
+    "planning": {
+      "mode": "auto",
+      "allow_replan": true,
+      "planning_time": 8.0,
+      "max_attempts": 3
+    },
+    "constraints": {
+      "avoid_collision": true,
+      "velocity_scale": 0.6,
+      "acceleration_scale": 0.6,
+      "position_tolerance": 0.005,
+      "orientation_tolerance": 2.0,
+      "keep_end_effector_orientation": false,
+      "safety_distance": 0.0,
+      "timeout": 30.0
+    },
+    "strategy_params": {
+      "ik_method": "trac_ik",
+      "cartesian_step": 0.006
+    }
+  },
+  "steps": [
+    {
+      "name": "移动到按钮正上方的预按压位",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {
+          "type": "pose",
+          "frame": "world",
+          "position": {"x": 0.60, "y": -0.35, "z": 0.7},
+          "orientation": {
+            "representation": "rpy",
+            "roll": 180.0,
+            "pitch": 0.0,
+            "yaw": 0.0
+          }
+        },
+        "motion": {"path_type": "joint"}
+      }
+    },
+    {
+      "name": "向下按压红色按钮并回撤",
+      "type": "press",
+      "request": {
+        "target": {
+          "type": "button",
+          "object_id": "push_button_key",
+          "surface_normal": [0.0, 0.0, 1.0]
+        },
+        "press": {
+          "strategy": "displacement_press",
+          "control_mode": "displacement",
+          "operation": "press",
+          "direction_source": "surface_normal",
+          "retract_after_press": true,
+          "verification_mode": "position"
+        },
+        "constraints": {
+          "maximum_force": 100.0,
+          "maximum_travel": 0.10,
+          "contact_threshold": 0.2,
+          "press_speed": 0.01,
+          "retract_speed": 0.03,
+          "hold_time": 0.5,
+          "verify_press": true,
+          "retry_count": 0,
+          "timeout": 15.0,
+          "require_contact": true,
+          "emergency_retract": true
+        },
+        "strategy_params": {
+          "press_depth": 0.05,
+          "stop_on_contact": false
+        }
+      }
+    },
+    {
+      "name": "关节运动回到Home并结束",
+      "type": "move",
+      "allow_path_change": true,
+      "request": {
+        "target": {
+          "type": "joint",
+          "joint_positions": [0.0, -2.094395, 1.570796, -1.5707963, -1.5707963, 0.0]
+        },
+        "motion": {"path_type": "joint"}
+      }
+    }
+  ]
+}

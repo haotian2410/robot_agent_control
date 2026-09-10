@@ -1,0 +1,59 @@
+name: grasp
+version: "2.0"
+description: Default configuration for Grasp Skill execution.
+
+grasp:
+  default_strategy: default_grasp
+  default_operation: grasp
+  default_verification_mode: auto
+  default_timeout: 10.0
+  verify_grasp: true
+  retry_count: 0
+  hold_on_success: true
+
+selection:
+  explicit_strategy_priority: true
+  default_strategy: default_grasp
+  fallback:
+    enabled: false
+
+strategies:
+  default_grasp:
+    enabled: true
+    schema: strategies/default_grasp/default_grasp.schema.yaml
+    defaults:
+      open_width: 0.08
+      close_width: 0.0
+      close_speed: 0.5
+      grasp_force: 20.0
+      hold_force: 10.0
+      contact_threshold: 2.0
+      position_tolerance: 0.002
+      force_tolerance: 2.0
+      settle_time: 0.3
+
+validation:
+  preconditions:
+    require_controller_ready: true
+    require_known_gripper_state: true
+    require_valid_limits: true
+    require_safe_robot_state: true
+  result:
+    check_position: true
+    check_force: true
+    check_contact: true
+    check_object_presence: true
+    check_object_slip: true
+
+retry:
+  enabled: true
+  require_recoverable_error: true
+  require_safe_state: true
+  reopen_before_retry: true
+  maximum_retry_count: 3
+  never_change_robot_pose: true
+
+runtime:
+  require_synchronized_state: true
+  require_gripper_model: true
+  require_controller_state: true

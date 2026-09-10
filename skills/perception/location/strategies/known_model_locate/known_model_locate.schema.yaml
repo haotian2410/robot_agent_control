@@ -1,0 +1,50 @@
+name: KnownModelLocate
+version: "2.0"
+
+description: Parameters specific to the Known Model Locate Strategy.
+
+input:
+  model_id:
+    type: string
+    description: Optional override; normally derived from target.model_id or runtime target prior.
+
+  model_frame:
+    type: string
+    default: model
+
+  registration_method:
+    type: string
+    default: auto
+    enum: [auto, icp, gicp, ndt, feature_based]
+
+  voxel_size:
+    type: float
+    unit: meter
+    range: [0.0001, 0.1]
+    default: 0.005
+
+  max_correspondence_distance:
+    type: float
+    unit: meter
+    range: [0.0001, 1.0]
+    default: 0.02
+
+  fitness_threshold:
+    type: float
+    range: [0.0, 1.0]
+    default: 0.7
+
+  use_initial_guess:
+    type: boolean
+    default: false
+
+  initial_pose:
+    type: object
+    description: Optional initial object-pose estimate.
+
+  operation_point:
+    type: string
+    default: auto
+
+validation_rules:
+  - require_any: [model_id, locate.target.model_id, locate.runtime_context.target_prior.model_id]

@@ -1,0 +1,245 @@
+name: Move
+version: "2.0"
+
+description: >-
+  Move a robot arm to a Cartesian pose, joint state, or named robot state.
+  Path Strategy and Planning Mode are selected independently.
+
+input:
+  target:
+    type: object
+    required: true
+    description: Desired robot state.
+    properties:
+      type:
+        type: string
+        required: true
+        enum: [pose, joint, named_state]
+
+      frame:
+        type: string
+        default: base
+        description: Reference frame of a pose target.
+
+      position:
+        type: object
+        properties:
+          x: {type: float, unit: meter}
+          y: {type: float, unit: meter}
+          z: {type: float, unit: meter}
+
+      orientation:
+        type: object
+        description: Quaternion is recommended internally; RPY is accepted at the skill boundary.
+        properties:
+          representation:
+            type: string
+            default: quaternion
+            enum: [quaternion, rpy]
+          x: {type: float}
+          y: {type: float}
+          z: {type: float}
+          w: {type: float}
+          roll: {type: float, unit: degree}
+          pitch: {type: float, unit: degree}
+          yaw: {type: float, unit: degree}
+
+      joint_positions:
+        type: array
+        item_type: float
+        unit: radian
+
+      state_name:
+        type: string
+        description: Name of a configured state such as home, ready, or park.
+
+    validation_rules:
+      - when: target.type == pose
+        require: [target.frame, target.position]
+      - when: target.type == joint
+        require: [target.joint_positions]
+      - when: target.type == named_state
+        require: [target.state_name]
+
+  motion:
+    type: object
+    default: {}
+    description: Task-level motion intent used by the deterministic selector.
+    properties:
+      path_type:
+        type: string
+        default: auto
+        enum: [auto, joint, linear, circular]
+
+      path_constraint:
+        type: string
+        default: soft
+        enum: [soft, hard]
+
+      phase:
+        type: string
+        default: transit
+        enum: [transit, approach, retreat, contact]
+
+      optimization_goal:
+        type: string
+        default: balanced
+        enum: [balanced, fastest, shortest, smoothest, safest]
+
+  planning:
+    type: object
+    default: {}
+    properties:
+      mode:
+        type: string
+        default: auto
+        enum: [auto, direct, collision_free]
+
+      allow_replan:
+        type: boolean
+        default: true
+
+      planning_time:
+        type: float
+        unit: second
+        range: [0.1, 120.0]
+        default: 5.0
+
+      planner_type:
+        type: string
+        default: auto
+        description: Backend planner identifier; interpreted by the implementation.
+
+      max_attempts:
+        type: integer
+        range: [1, 20]
+        default: 3
+
+  constraints:
+    type: object
+    default: {}
+    properties:
+      avoid_collision:
+        type: boolean
+        default: true
+
+      velocity_scale:
+        type: float
+        range: [0.0, 1.0]
+        default: 0.5
+
+      acceleration_scale:
+        type: float
+        range: [0.0, 1.0]
+        default: 0.5
+
+      position_tolerance:
+        type: float
+        unit: meter
+        range: [0.0, 0.1]
+        default: 0.005
+
+      orientation_tolerance:
+        type: float
+        unit: degree
+        range: [0.0, 180.0]
+        default: 2.0
+
+      keep_end_effector_orientation:
+        type: boolean
+        default: false
+        description: Keep the current end-effector orientation throughout Cartesian and collision-free motion.
+
+      safety_distance:
+        type: float
+        unit: meter
+        range: [0.0, 1.0]
+        description: Optional request-level override. Phase-specific config is used when omitted.
+
+      timeout:
+        type: float
+        unit: second
+        range: [0.1, 600.0]
+        default: 30.0
+
+  strategy_params:
+    type: object
+    default: {}
+    description: >-
+      Parameters owned by the selected Path Strategy. The selected strategy schema
+      performs the final validation.
+    properties:
+      ik_method:
+        type: string
+        default: auto
+        enum: [auto, ikfast, trac_ik]
+        description: IKFast is analytic; TRAC-IK is numerical. Auto tries IKFast first.
+      ik_seed:
+        type: array
+        item_type: float
+        unit: radian
+        description: Optional six-joint seed used to select a continuous IK branch.
+      cartesian_step:
+        type: float
+        unit: meter
+        range: [0.001, 0.1]
+        default: 0.01
+      via_point: {type: object}
+      arc_center: {type: object}
+      arc_axis: {type: object}
+      arc_angle: {type: float, unit: radian}
+
+  runtime_context:
+    type: object
+    internal: true
+    description: Populated by the robot runtime rather than generated by the Agent.
+    properties:
+      current_joint_state: {type: array, item_type: float, unit: radian}
+      current_pose: {type: object}
+      robot_model: {type: object}
+      planning_scene: {type: object}
+      obstacle_state: {type: object}
+      tool_state: {type: object}
+      payload_state: {type: object}
+      controller_state: {type: object}
+
+output:
+  success:
+    type: boolean
+
+  status:
+    type: string
+    enum: [completed, failed, timeout, stopped, replanning]
+
+  selection:
+    type: object
+    properties:
+      path_strategy:
+        type: string
+        enum: [joint_move, linear_move, circular_move]
+      planning_mode:
+        type: string
+        enum: [direct, collision_free]
+      selection_reason: {type: string}
+      fallback_used: {type: boolean}
+
+  execution_result:
+    type: object
+    properties:
+      final_joint_state: {type: array, item_type: float, unit: radian}
+      final_pose: {type: object}
+      position_error: {type: float, unit: meter}
+      orientation_error: {type: float, unit: degree}
+      planning_time: {type: float, unit: second}
+      execution_time: {type: float, unit: second}
+
+  error:
+    type: object
+    nullable: true
+    properties:
+      error_code: {type: string}
+      error_message: {type: string}
+      failed_stage: {type: string}
+      recoverable: {type: boolean}
+      recommended_action: {type: string}
+      details: {type: object, nullable: true}

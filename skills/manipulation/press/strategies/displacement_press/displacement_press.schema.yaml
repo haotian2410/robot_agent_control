@@ -1,0 +1,38 @@
+name: DisplacementPress
+version: "1.0"
+
+description: Parameters specific to the Displacement Press Strategy.
+
+input:
+  press_depth:
+    type: float
+    unit: meter
+    range: [0.0001, 1.0]
+    description: Target displacement measured from detected contact.
+
+  travel_distance:
+    type: float
+    unit: meter
+    range: [0.0001, 1.0]
+    description: Total travel measured from the pre-press pose.
+
+  stop_on_contact:
+    type: boolean
+    default: false
+
+  post_contact_depth:
+    type: float
+    unit: meter
+    range: [0.0, 1.0]
+    default: 0.003
+
+  motion_profile:
+    type: string
+    default: constant_velocity
+    enum: [constant_velocity, trapezoidal, smooth]
+
+validation_rules:
+  - require_any: [press_depth, travel_distance]
+  - assert_any: [press_depth <= press.constraints.maximum_travel, travel_distance <= press.constraints.maximum_travel]
+  - when: stop_on_contact == false
+    require_any: [press_depth, post_contact_depth, travel_distance]
