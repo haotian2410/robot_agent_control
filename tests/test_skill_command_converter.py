@@ -17,7 +17,7 @@ class SkillCommandConverterTest(unittest.TestCase):
         cls.config = convert_file(COMMAND_FILE, check_approach_collisions=False)
 
     def test_builds_test_configuration_shape(self) -> None:
-        self.assertEqual(self.config["scene"], "world_model/robotsim/scene_001.xml")
+        self.assertEqual(self.config["scene"], "../../../world_model/robotsim/scene_001.xml")
         self.assertIn("runtime", self.config)
         self.assertIn("viewer", self.config)
         self.assertIn("request_defaults", self.config)

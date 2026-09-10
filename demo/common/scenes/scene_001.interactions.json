@@ -1,6 +1,9 @@
 {
   "version": 2,
-  "scene": "world_model/robotsim/scene_001.xml",
+  "registry_version": 1,
+  "coordinate_frame": "mujoco_world",
+  "scene_fingerprint": "78d8f804e3dcb23a6deea9c45ad4f1578dc2634919e7753bae671376c1524aff",
+  "scene": "../../../world_model/robotsim/scene_001.xml",
   "move_defaults": {
     "motion": {"path_constraint": "soft", "phase": "transit", "optimization_goal": "balanced"},
     "planning": {"mode": "auto", "allow_replan": true, "planning_time": 8.0, "max_attempts": 3},

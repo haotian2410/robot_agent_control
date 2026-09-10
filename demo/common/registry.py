@@ -15,17 +15,20 @@ class SceneRegistryError(ValueError):
 class SceneRegistry:
     """Read-only access to scene objects, targets and action requests."""
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, *, scene_path: str | Path | None = None) -> None:
         self.path = Path(path).resolve()
+        self._scene_path_override = Path(scene_path).resolve() if scene_path is not None else None
         with self.path.open("r", encoding="utf-8") as stream:
             self.data: dict[str, Any] = json.load(stream)
         self._validate()
 
     @property
     def scene_path(self) -> Path:
+        if self._scene_path_override is not None:
+            return self._scene_path_override
         path = Path(self.data["scene"])
         if not path.is_absolute():
-            path = self.path.parents[3] / path
+            path = self.path.parent / path
         return path.resolve()
 
     @property

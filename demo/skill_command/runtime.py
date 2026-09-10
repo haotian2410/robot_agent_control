@@ -29,7 +29,7 @@ class SkillRuntime:
             registry.scene_path,
             end_effector_site=config.get("end_effector_site", "robotiq_2f85_pinch"),
             execution_mode=config.get("execution_mode", "kinematic"),
-            realtime=True,
+            realtime=bool(config.get("realtime", True)),
             playback_fps=config.get("playback_fps", 60.0),
             playback_speed=config.get("playback_speed", 1.0),
             minimum_playback_duration=config.get("minimum_playback_duration", 4.0),

@@ -1,6 +1,9 @@
 {
   "version": 2,
-  "scene": "world_model/robotsim/scene_003.xml",
+  "registry_version": 1,
+  "coordinate_frame": "mujoco_world",
+  "scene_fingerprint": "6fdf9f0a5f3c455d2641546ca3f06120aff2c359f8bb7da81d57b720c7c4d282",
+  "scene": "../../../world_model/robotsim/scene_003.xml",
   "move_defaults": {"motion": {"path_constraint": "soft", "phase": "transit"}, "planning": {"mode": "auto", "allow_replan": true, "planning_time": 8.0}, "constraints": {"avoid_collision": true, "velocity_scale": 0.6, "acceleration_scale": 0.6, "timeout": 30.0}, "strategy_params": {"ik_method": "trac_ik", "cartesian_step": 0.006}},
   "adaptive_approach": {
     "push_button_key": {"required": true, "anchors": ["target"], "direction_frame": "world", "direction": [0, 0, 1], "distance": 0.08, "pre_path_type": "joint", "final_path_type": "linear", "keep_orientation": true}

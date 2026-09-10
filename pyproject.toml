@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "robot-agent-control"
+version = "0.1.0"
+description = "Deterministic UR5e MuJoCo skill execution runtime"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "mujoco>=3.3,<4",
+  "numpy>=2,<3",
+  "pydantic>=2,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9"]
+
+[project.scripts]
+robot-agent-control = "robot_agent_control.cli:main"
+robot-agent-control-demo = "robot_agent_control.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/robot_agent_control",
+  "collision",
+  "control",
+  "demo",
+  "kinematics",
+  "libraries",
+  "skills",
+  "utils",
+]
+
+[tool.hatch.build.targets.wheel.force-include]
+"demo/common/scenes" = "robot_agent_control/fixtures/interactions"
+"demo/skill_command/config_001.commands.json" = "robot_agent_control/fixtures/config_001.commands.json"
+"world_model/robotsim" = "robot_agent_control/fixtures/robotsim"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
