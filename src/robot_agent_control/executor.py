@@ -231,7 +231,9 @@ class ControlExecutor:
         for command_index, command in enumerate(document.commands, 1):
             viewer = viewer_state[0] if viewer_state else None
             if viewer is not None and not viewer.is_running():
-                state["failure"] = self._failure(command, None, "VIEWER_CLOSED", "viewer closed by user")
+                state["failure"] = self._failure(
+                    command, None, "EXECUTION_CANCELLED_BY_USER", "viewer closed by user"
+                )
                 return
             state["started"] += 1
             session.update()
@@ -239,7 +241,8 @@ class ControlExecutor:
             steps = [] if converted is None else (converted if isinstance(converted, list) else [converted])
             if not steps:
                 state["completed"] += 1
-                self._trace(trace_path, command, None, True, 0.0, None)
+                now = datetime.now(UTC)
+                self._trace(trace_path, command, None, True, 0.0, None, now, now)
                 continue
             for step in steps:
                 runtime_index += 1
@@ -262,7 +265,10 @@ class ControlExecutor:
                     result=result,
                 )
                 reports.append(report)
-                self._trace(trace_path, command, runtime_step_id, success, duration, result)
+                self._trace(
+                    trace_path, command, runtime_step_id, success, duration,
+                    result, before, after,
+                )
                 if not success:
                     error = result.get("error") or {}
                     state["failure"] = self._failure(
@@ -281,7 +287,7 @@ class ControlExecutor:
                         time.sleep(1.0 / session.runtime.playback_fps)
                     if not viewer.is_running():
                         state["failure"] = self._failure(
-                            command, runtime_step_id, "VIEWER_CLOSED", "viewer closed by user"
+                            command, runtime_step_id, "EXECUTION_CANCELLED_BY_USER", "viewer closed by user"
                         )
                         return
             state["completed"] += 1
@@ -305,7 +311,10 @@ class ControlExecutor:
         viewer.cam.elevation = -25.0
 
     @staticmethod
-    def _trace(path, command, runtime_step_id, success, duration, result):
+    def _trace(
+        path, command, runtime_step_id, success, duration, result,
+        started_at, finished_at,
+    ):
         if path is None:
             return
         event = {
@@ -315,7 +324,11 @@ class ControlExecutor:
             "runtime_step_id": runtime_step_id,
             "skill": command.skill_name,
             "target": command.parameters.get("target"),
+            "started": True,
+            "completed": bool(success),
             "success": success,
+            "started_at": started_at.isoformat(),
+            "finished_at": finished_at.isoformat(),
             "duration_seconds": duration,
             "error": (result or {}).get("error") if result else None,
         }

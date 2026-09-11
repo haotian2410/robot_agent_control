@@ -57,4 +57,22 @@ def test_headless_executor_writes_report_and_trace(tmp_path):
     assert saved["success"] is True
     trace = (tmp_path / "skill_trace.jsonl").read_text(encoding="utf-8").splitlines()
     assert len(trace) == 1
-    assert json.loads(trace[0])["runtime_step_id"] == "runtime-step-001"
+    event = json.loads(trace[0])
+    assert event["runtime_step_id"] == "runtime-step-001"
+    assert event["started"] is event["completed"] is event["success"] is True
+    assert event["started_at"] <= event["finished_at"]
+
+
+def test_registry_source_names_are_checked_before_execution(tmp_path):
+    document = load_command_document(COMMANDS)
+    registry = json.loads(Path(document.registry).read_text(encoding="utf-8"))
+    registry["objects"]["red_ball"]["spatial"]["source"] = {
+        "type": "body",
+        "name": "body_that_does_not_exist",
+    }
+    registry_path = tmp_path / "interactions.json"
+    registry_path.write_text(json.dumps(registry), encoding="utf-8")
+    document = document.model_copy(update={"registry": str(registry_path)})
+    with pytest.raises(ExecutionPreflightError, match="body_that_does_not_exist") as captured:
+        ControlExecutor().execute(document, viewer_mode="headless")
+    assert captured.value.code == "REGISTRY_INVALID"
