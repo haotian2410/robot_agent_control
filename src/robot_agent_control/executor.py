@@ -146,6 +146,7 @@ class ControlExecutor:
             runtime["minimum_playback_duration"] = 0.0
         session = SkillRuntime(registry, runtime)
         self._validate_robot(session.model, document.runtime.end_effector_site)
+        self._validate_registry_sources(session.model, registry)
 
         # Pure conversion catches unsupported skills, targets, anchors and
         # actions before a viewer is opened. It intentionally does no collision
@@ -154,6 +155,43 @@ class ControlExecutor:
         for index, command in enumerate(document.commands, 1):
             probe.convert_command(command.model_dump(), index)
         return registry, session
+
+    @staticmethod
+    def _validate_registry_sources(model: mujoco.MjModel, registry: SceneRegistry) -> None:
+        """Resolve every authored body/site/geom source before opening a viewer."""
+        missing: list[str] = []
+        valid_types = {
+            "body": mujoco.mjtObj.mjOBJ_BODY,
+            "site": mujoco.mjtObj.mjOBJ_SITE,
+            "geom": mujoco.mjtObj.mjOBJ_GEOM,
+            "joint": mujoco.mjtObj.mjOBJ_JOINT,
+        }
+        for object_key, obj in registry.objects.items():
+            source = obj.get("spatial", {}).get("source", {})
+            source_type = source.get("type")
+            source_name = source.get("name")
+            if source_type not in valid_types or not isinstance(source_name, str):
+                missing.append(f"{object_key}:invalid_source")
+                continue
+            if mujoco.mj_name2id(model, valid_types[source_type], source_name) < 0:
+                missing.append(f"{object_key}:{source_type}:{source_name}")
+            body_name = obj.get("body_name")
+            if isinstance(body_name, str) and mujoco.mj_name2id(
+                model, mujoco.mjtObj.mjOBJ_BODY, body_name
+            ) < 0:
+                missing.append(f"{object_key}:body:{body_name}")
+            for action, spec in obj.get("affordances", {}).items():
+                if not isinstance(spec, dict):
+                    continue
+                acting = str(spec.get("acting_target", object_key))
+                action_request = registry.objects.get(acting, {}).get("action_requests", {}).get(action)
+                if action_request is None:
+                    missing.append(f"{object_key}:action_request:{acting}.{action}")
+        if missing:
+            raise ExecutionPreflightError(
+                "REGISTRY_INVALID",
+                "registry references missing MuJoCo names: " + ", ".join(missing),
+            )
 
     @staticmethod
     def _validate_robot(model: mujoco.MjModel, end_effector_site: str) -> None:
@@ -283,4 +321,3 @@ class ControlExecutor:
         }
         with path.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(event, ensure_ascii=False) + "\n")
-

@@ -21,7 +21,7 @@
       "interactable": true,
       "object_id": "red_ball",
       "body_name": "red_ball_body",
-      "aliases": ["红色小球", "红球", "小球"],
+      "aliases": ["红色小球", "红球", "小球", "red ball"],
       "spatial": {"source": {"type": "body", "name": "red_ball_body"}, "reference_pose": {"position": [0.48, 0.42, 0.67], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]}, "default_anchor": "target", "anchors": {"target": {"target_id": "red_ball_target", "aliases": ["目标处", "物体处"]}, "grasp": {"target_id": "red_ball_grasp", "aliases": ["抓取位姿", "抓取位置", "红球处", "球处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.125, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "relation_target_ids": {"above": "red_ball_top"}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": 0.0, "yaw": 30.0}},
       "default_interactions": {"grasp": "grasp"},
       "action_requests": {
@@ -64,7 +64,7 @@
     "blue_cabinet_upper_compartment": {
       "interactable": false,
       "object_id": "blue_cabinet_upper_compartment",
-      "aliases": ["蓝色柜子上层", "原柜子上层", "柜子上层"],
+      "aliases": ["蓝色柜子上层", "原柜子上层", "柜子上层", "blue cabinet upper compartment", "upper compartment"],
       "spatial": {"source": {"type": "body", "name": "blue_cabinet"}, "reference_pose": {"position": [0.58, -0.42, 0.6], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "interior", "anchors": {"interior": {"target_id": "blue_cabinet_upper_interior", "aliases": ["内部", "里面"], "local_position": [-0.07, 0.0, 0.26]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.23, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
       "default_interactions": {},
       "action_requests": {}
@@ -81,7 +81,7 @@
       "interactable": true,
       "object_id": "blue_cabinet_handle",
       "body_name": "blue_cabinet_door",
-      "aliases": ["蓝色柜门把手", "柜门把手", "柜门手柄"],
+      "aliases": ["蓝色柜门把手", "柜门把手", "柜门手柄", "blue cabinet handle", "cabinet handle"],
       "spatial": {"source": {"type": "site", "name": "blue_cabinet_handle_site"}, "reference_pose": {"position": [0.4304673206, -0.2246414123, 0.81], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "target", "anchors": {"target": {"target_id": "blue_cabinet_handle_target", "aliases": ["把手处", "接触位", "抓取位姿"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}, "moved_tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": 75.0}, "preferred_joint_ik_seed": [-1.2984174059, -1.9615684094, 2.3431091128, -0.3815408360, 0.5341784346, 3.1415927663]},
       "default_interactions": {"grasp": "target"},
       "action_requests": {
@@ -92,7 +92,7 @@
     "blue_cabinet_door": {
       "interactable": true,
       "object_id": "blue_cabinet_door",
-      "aliases": ["蓝色柜门", "柜门"],
+      "aliases": ["蓝色柜门", "柜门", "blue cabinet door", "cabinet door"],
       "affordances": {"pull": {"acting_target": "blue_cabinet_door", "contact_target": "blue_cabinet_handle"}, "push": {"acting_target": "blue_cabinet_door", "contact_target": "blue_cabinet_handle"}},
       "spatial": {"source": {"type": "site", "name": "blue_cabinet_handle_site"}, "reference_pose": {"position": [0.4304673206, -0.2246414123, 0.81], "quaternion_wxyz": [0.991444861, 0, 0, -0.130526192]}, "default_anchor": "target", "anchors": {"target": {"target_id": "blue_cabinet_door_handle", "aliases": ["把手", "手柄", "目标处"]}}, "directions_local": {"above": [0, 0, 1], "below": [0, 0, -1], "front": [-1, 0, 0], "behind": [1, 0, 0], "left": [0, 1, 0], "right": [0, -1, 0], "at": [0, 0, 0]}, "default_distances": {"above": 0.1, "below": 0.1, "front": 0.1, "behind": 0.1, "left": 0.1, "right": 0.1, "at": 0.0}, "tool_orientation": {"representation": "rpy", "roll": 180.0, "pitch": -90.0, "yaw": -15.0}},
       "default_interactions": {"pull": "handle", "push": "handle"},
