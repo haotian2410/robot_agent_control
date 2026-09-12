@@ -1,5 +1,7 @@
 # robot-agent-control
 
+> **Moved:** active development has moved to [`haotian2410/robot_agent_stack`](https://github.com/haotian2410/robot_agent_stack). This repository is retained as a compatibility/frozen source; new features and fixes belong in the monorepo.
+
 `robot-agent-control` 是 `robot-agent-sim` 的执行层：负责把 versioned command document
 转换成 MuJoCo 中的 IK、轨迹、夹爪和交互动作。它不负责自然语言理解、Qwen 调用、Route A/B
 选择或场景/模型检索。
